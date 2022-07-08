@@ -40,6 +40,7 @@ public class OAPServerBootstrap {
         ApplicationConfigLoader configLoader = new ApplicationConfigLoader();
         ModuleManager manager = new ModuleManager();
         try {
+            // 加载 application.yml 文件，将配置解析到 ApplicationConfiguration
             ApplicationConfiguration applicationConfiguration = configLoader.load();
             manager.init(applicationConfiguration);
 

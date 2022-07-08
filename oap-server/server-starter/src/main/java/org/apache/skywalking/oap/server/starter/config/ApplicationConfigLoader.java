@@ -146,6 +146,23 @@ public class ApplicationConfigLoader implements ConfigLoader<ApplicationConfigur
         }
     }
 
+    /*
+    cluster:
+        selector: ${SW_CLUSTER:standalone}
+        standalone:
+        zookeeper:
+            xxx
+        kubernetes:
+            xxx
+        consul:
+            xxx
+        etcd:
+            xxx
+        nacos:
+            xxx
+    core:
+        selector: ${SW_CORE:default}
+     */
     private void selectConfig(final Map<String, Map<String, Object>> moduleConfiguration) {
         Iterator<Map.Entry<String, Map<String, Object>>> moduleIterator = moduleConfiguration.entrySet().iterator();
         while (moduleIterator.hasNext()) {
@@ -155,10 +172,13 @@ public class ApplicationConfigLoader implements ConfigLoader<ApplicationConfigur
             if (!providerConfig.containsKey(SELECTOR)) {
                 continue;
             }
+            // 获取 selector 对应的值（比如 ${SW_CLUSTER:standalone}）
             final String selector = (String) providerConfig.get(SELECTOR);
+            // 替换占位符${}（比如 standalone）
             final String resolvedSelector = PropertyPlaceholderHelper.INSTANCE.replacePlaceholders(
                 selector, System.getProperties()
             );
+            // 移除不等于 selector 值（比如standalone）的 key，这样就只剩下选中的 key
             providerConfig.entrySet().removeIf(e -> !resolvedSelector.equals(e.getKey()));
 
             if (!providerConfig.isEmpty()) {
