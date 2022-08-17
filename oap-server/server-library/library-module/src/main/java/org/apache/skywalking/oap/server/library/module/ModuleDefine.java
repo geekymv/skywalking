@@ -33,9 +33,9 @@ public abstract class ModuleDefine implements ModuleProviderHolder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleDefine.class);
 
     private ModuleProvider loadedProvider = null;
-
+    // 模块名称
     private final String name;
-
+    // 模块名称通过构造方法传入，所有子类必须重写这个构造方法
     public ModuleDefine(String name) {
         this.name = name;
     }
@@ -55,24 +55,29 @@ public abstract class ModuleDefine implements ModuleProviderHolder {
 
     /**
      * Run the prepare stage for the module, including finding all potential providers, and asking them to prepare.
-     *
+     * prepare 阶段
+     * 1.查找所有 provider
+     * 2.调用 provider 的 prepare 方法
      * @param moduleManager of this module
      * @param configuration of this module
      * @throws ProviderNotFoundException when even don't find a single one providers.
      */
     void prepare(ModuleManager moduleManager, ApplicationConfiguration.ModuleConfiguration configuration,
         ServiceLoader<ModuleProvider> moduleProviderLoader) throws ProviderNotFoundException, ServiceNotProvidedException, ModuleConfigException, ModuleStartException {
+        // 找到 module 对应的 provider，比如 cluster 的 provider 可以是 zookeeper
         for (ModuleProvider provider : moduleProviderLoader) {
+            // configuration 中只会有 selector 配置的 provider
             if (!configuration.has(provider.name())) {
                 continue;
             }
-
+            //  provider.module() 获取provider 所属的 module，比如 zookeeper 属于 cluster 模块（ClusterModule）
             if (provider.module().equals(getClass())) {
                 if (loadedProvider == null) {
                     loadedProvider = provider;
                     loadedProvider.setManager(moduleManager);
                     loadedProvider.setModuleDefine(this);
                 } else {
+                    // 一个 module 只能有一个 provider，比如 cluster 的 provider 可以是 standalone、zookeeper、kubernetes 等中的一个
                     throw new DuplicateProviderException(this.name() + " module has one " + loadedProvider.name() + "[" + loadedProvider
                         .getClass()
                         .getName() + "] provider already, " + provider.name() + "[" + provider.getClass()
@@ -88,11 +93,14 @@ public abstract class ModuleDefine implements ModuleProviderHolder {
 
         LOGGER.info("Prepare the {} provider in {} module.", loadedProvider.name(), this.name());
         try {
+            // 将配置信息赋值给provider config
             copyProperties(loadedProvider.createConfigBeanIfAbsent(), configuration.getProviderConfiguration(loadedProvider
                 .name()), this.name(), loadedProvider.name());
         } catch (IllegalAccessException e) {
             throw new ModuleConfigException(this.name() + " module config transport to config bean failure.", e);
         }
+        // provider prepare
+        // 调用 provider 的 prepare 方法
         loadedProvider.prepare();
     }
 
@@ -115,6 +123,13 @@ public abstract class ModuleDefine implements ModuleProviderHolder {
         }
     }
 
+    /**
+     * 通过反射，获取属性
+     * @param destClass
+     * @param fieldName
+     * @return
+     * @throws NoSuchFieldException
+     */
     private Field getDeclaredField(Class<?> destClass, String fieldName) throws NoSuchFieldException {
         if (destClass != null) {
             Field[] fields = destClass.getDeclaredFields();

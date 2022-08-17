@@ -43,11 +43,13 @@ public abstract class ModuleProvider implements ModuleServiceHolder {
 
     /**
      * @return the name of this provider.
+     * provider 名称，比如 zookeeper
      */
     public abstract String name();
 
     /**
      * @return the moduleDefine name
+     * provider 所属的模块，比如 zookeeper 这个 provider 所属的模块是 cluster
      */
     public abstract Class<? extends ModuleDefine> module();
 

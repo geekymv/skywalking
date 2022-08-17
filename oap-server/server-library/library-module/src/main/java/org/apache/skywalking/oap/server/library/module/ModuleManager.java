@@ -37,12 +37,16 @@ public class ModuleManager implements ModuleDefineHolder {
     public void init(
         ApplicationConfiguration applicationConfiguration) throws ModuleNotFoundException, ProviderNotFoundException, ServiceNotProvidedException, CycleDependencyException, ModuleConfigException, ModuleStartException {
         String[] moduleNames = applicationConfiguration.moduleList();
+        // 通过JDK SPI 加载 ModuleDefine 和 ModuleProvider
+        // ModuleDefine 位于具体模块里的 /resource/META-INF/service/ 目录下，比如 server-core 下的
         ServiceLoader<ModuleDefine> moduleServiceLoader = ServiceLoader.load(ModuleDefine.class);
+        // ModuleProvider 位于具体模块里的 /resource/META-INF/service/ 目录下，比如 cluster-zookeeper-plugin
         ServiceLoader<ModuleProvider> moduleProviderLoader = ServiceLoader.load(ModuleProvider.class);
 
         HashSet<String> moduleSet = new HashSet<>(Arrays.asList(moduleNames));
         for (ModuleDefine module : moduleServiceLoader) {
             if (moduleSet.contains(module.name())) {
+                // 调用 prepare
                 module.prepare(this, applicationConfiguration.getModuleConfiguration(module.name()), moduleProviderLoader);
                 loadedModules.put(module.name(), module);
                 moduleSet.remove(module.name());

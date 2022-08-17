@@ -42,6 +42,7 @@ public class OAPServerBootstrap {
         try {
             // 加载 application.yml 文件，将配置解析到 ApplicationConfiguration
             ApplicationConfiguration applicationConfiguration = configLoader.load();
+            // 初始化给定的 module
             manager.init(applicationConfiguration);
 
             manager.find(TelemetryModule.NAME)

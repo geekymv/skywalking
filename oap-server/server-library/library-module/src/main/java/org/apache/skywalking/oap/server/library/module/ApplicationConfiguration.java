@@ -54,6 +54,7 @@ public class ApplicationConfiguration {
      * The configurations about a certain module.
      */
     public static class ModuleConfiguration {
+        // <provider名称，配置>，比如 <zookeeper, properties>
         private HashMap<String, ProviderConfiguration> providers = new HashMap<>();
 
         private ModuleConfiguration() {
