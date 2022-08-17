@@ -26,6 +26,9 @@ import lombok.Setter;
  * The <code>ModuleProvider</code> is an implementation of a {@link ModuleDefine}.
  * <p>
  * And each moduleDefine can have one or more implementation, which depends on `application.yml`
+ *
+ * ModuleProvider 是 ModuleDefine 的一个具体实现，比如 cluster 可以通过 zookeeper 实现
+ * 每个 ModuleDefine 可以有多个实现，实际起作用的只能是其中的一个，通过在 application.yml 中配置 selector。
  */
 public abstract class ModuleProvider implements ModuleServiceHolder {
     @Setter

@@ -18,10 +18,26 @@
 
 package org.apache.skywalking.oap.server.library.module;
 
+/**
+ * 模块需要的Service
+ * 每个 ModuleProvider 提供一个容器（Map<Class<? extends Service>, Service> services），用于存储接口和对应的实现类
+ */
 public interface ModuleServiceHolder {
-
+    /**
+     * 注册服务实现
+     * @param serviceType
+     * @param service
+     * @throws ServiceNotProvidedException
+     */
     void registerServiceImplementation(Class<? extends Service> serviceType,
         Service service) throws ServiceNotProvidedException;
 
+    /**
+     * 查找服务实现
+     * @param serviceType
+     * @param <T>
+     * @return
+     * @throws ServiceNotProvidedException
+     */
     <T extends Service> T getService(Class<T> serviceType) throws ServiceNotProvidedException;
 }

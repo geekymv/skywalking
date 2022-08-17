@@ -136,7 +136,7 @@ public class ClusterModuleZookeeperProvider extends ModuleProvider {
             LOGGER.error(e.getMessage(), e);
             throw new ModuleStartException(e.getMessage(), e);
         }
-
+        // 注册需要实现的 Service 接口 和 对应的具体实现类
         this.registerServiceImplementation(ClusterRegister.class, coordinator);
         this.registerServiceImplementation(ClusterNodesQuery.class, coordinator);
     }
