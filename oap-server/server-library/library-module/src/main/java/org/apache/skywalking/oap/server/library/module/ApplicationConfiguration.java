@@ -31,6 +31,11 @@ public class ApplicationConfiguration {
         return modules.keySet().toArray(new String[0]);
     }
 
+    /**
+     * 添加模块
+     * @param moduleName 模块名称 比如 cluster
+     * @return
+     */
     public ModuleConfiguration addModule(String moduleName) {
         ModuleConfiguration newModule = new ModuleConfiguration();
         modules.put(moduleName, newModule);
@@ -62,6 +67,12 @@ public class ApplicationConfiguration {
             return providers.containsKey(name);
         }
 
+        /**
+         * 添加 provider 的配置
+         * @param name provider名称，比如 zookeeper
+         * @param properties 配置
+         * @return
+         */
         public ModuleConfiguration addProviderConfiguration(String name, Properties properties) {
             ProviderConfiguration newProvider = new ProviderConfiguration(properties);
             providers.put(name, newProvider);

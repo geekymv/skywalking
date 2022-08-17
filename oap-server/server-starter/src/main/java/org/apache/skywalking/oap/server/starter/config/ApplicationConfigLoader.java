@@ -59,6 +59,7 @@ public class ApplicationConfigLoader implements ConfigLoader<ApplicationConfigur
             Reader applicationReader = ResourceUtils.read("application.yml");
             Map<String, Map<String, Object>> moduleConfig = yaml.loadAs(applicationReader, Map.class);
             if (CollectionUtils.isNotEmpty(moduleConfig)) {
+                // 筛选selector 设置的配置项，移除其他 provider 配置项
                 selectConfig(moduleConfig);
                 moduleConfig.forEach((moduleName, providerConfig) -> {
                     if (providerConfig.size() > 0) {
@@ -147,7 +148,7 @@ public class ApplicationConfigLoader implements ConfigLoader<ApplicationConfigur
     }
 
     /*
-    获取 selector 的配置项
+    获取 selector 的 provider 配置项
     cluster:
         selector: ${SW_CLUSTER:standalone}
         standalone:
@@ -170,7 +171,7 @@ public class ApplicationConfigLoader implements ConfigLoader<ApplicationConfigur
             Map.Entry<String, Map<String, Object>> entry = moduleIterator.next();
             // 模块名称，比如 cluster
             final String moduleName = entry.getKey();
-            // 模块名称下的所有配置项，比如 standalone、zookeeper、kubernetes 等
+            // 模块名称下的所有 provider 配置项，比如 standalone、zookeeper、kubernetes 等
             final Map<String, Object> providerConfig = entry.getValue();
             // 判断模块的配置项是否包含 selector
             if (!providerConfig.containsKey(SELECTOR)) {
@@ -182,7 +183,7 @@ public class ApplicationConfigLoader implements ConfigLoader<ApplicationConfigur
             final String resolvedSelector = PropertyPlaceholderHelper.INSTANCE.replacePlaceholders(
                 selector, System.getProperties()
             );
-            // 移除不等于 selector 值（比如standalone）的 key，这样最后就只剩下选中的 key
+            // 移除不等于 selector 值（比如standalone）的 provider，这样最后就只剩下选中的 provider
             providerConfig.entrySet().removeIf(e -> !resolvedSelector.equals(e.getKey()));
 
             if (!providerConfig.isEmpty()) {
