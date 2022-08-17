@@ -46,7 +46,7 @@ public class ModuleManager implements ModuleDefineHolder {
         HashSet<String> moduleSet = new HashSet<>(Arrays.asList(moduleNames));
         for (ModuleDefine module : moduleServiceLoader) {
             if (moduleSet.contains(module.name())) {
-                // 调用 prepare
+                // 调用每个 ModuleDefine 的 prepare 方法
                 module.prepare(this, applicationConfiguration.getModuleConfiguration(module.name()), moduleProviderLoader);
                 loadedModules.put(module.name(), module);
                 moduleSet.remove(module.name());
@@ -58,10 +58,11 @@ public class ModuleManager implements ModuleDefineHolder {
         if (moduleSet.size() > 0) {
             throw new ModuleNotFoundException(moduleSet.toString() + " missing.");
         }
-
+        // 根据依赖关系，对 ModuleProvider 排序
         BootstrapFlow bootstrapFlow = new BootstrapFlow(loadedModules);
-
+        // 启动所有 ModuleProvider
         bootstrapFlow.start(this);
+        // 所有 ModuleProvider 启动完成之后，回调通知
         bootstrapFlow.notifyAfterCompleted();
     }
 

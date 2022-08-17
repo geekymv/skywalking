@@ -78,6 +78,7 @@ public abstract class ModuleProvider implements ModuleServiceHolder {
 
     /**
      * @return moduleDefine names which does this moduleDefine require?
+     * 当前 provider 依赖的模块名称，比如 zookeeper 依赖 CoreModule
      */
     public abstract String[] requiredModules();
 

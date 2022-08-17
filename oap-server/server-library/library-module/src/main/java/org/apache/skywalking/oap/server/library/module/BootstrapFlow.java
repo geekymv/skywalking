@@ -32,7 +32,7 @@ class BootstrapFlow {
     BootstrapFlow(Map<String, ModuleDefine> loadedModules) throws CycleDependencyException, ModuleNotFoundException {
         this.loadedModules = loadedModules;
         startupSequence = new ArrayList<>();
-
+        // 根据依赖关系，对 ModuleProvider 排序
         makeSequence();
     }
 
@@ -55,6 +55,7 @@ class BootstrapFlow {
 
     private void makeSequence() throws CycleDependencyException, ModuleNotFoundException {
         List<ModuleProvider> allProviders = new ArrayList<>();
+        // 验证 ModuleProvider 依赖的模块是否已加载（完成 prepare 阶段）
         for (final ModuleDefine module : loadedModules.values()) {
             String[] requiredModules = module.provider().requiredModules();
             if (requiredModules != null) {
@@ -99,6 +100,7 @@ class BootstrapFlow {
                         i--;
                     }
                 } else {
+                    // 没有依赖的 ModuleProvider
                     startupSequence.add(provider);
                     allProviders.remove(i);
                     i--;
