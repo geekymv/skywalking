@@ -48,6 +48,7 @@ public class ZookeeperCoordinator implements ClusterRegister, ClusterNodesQuery 
     private final ClusterModuleZookeeperConfig config;
     private final ServiceDiscovery<RemoteInstance> serviceDiscovery;
     private final ServiceCache<RemoteInstance> serviceCache;
+    // 当前OAP实例自己的 address
     private volatile Address selfAddress;
     private HealthCheckMetrics healthChecker;
 
@@ -81,7 +82,7 @@ public class ZookeeperCoordinator implements ClusterRegister, ClusterNodesQuery 
                                                                                                     .build();
 
             serviceDiscovery.registerService(thisInstance);
-
+            // 记录自己的 address
             this.selfAddress = remoteInstance.getAddress();
             this.healthChecker.health();
         } catch (Throwable e) {
@@ -98,6 +99,7 @@ public class ZookeeperCoordinator implements ClusterRegister, ClusterNodesQuery 
             List<ServiceInstance<RemoteInstance>> serviceInstances = serviceCache.getInstances();
             serviceInstances.forEach(serviceInstance -> {
                 RemoteInstance instance = serviceInstance.getPayload();
+                // 判断是否是自己的 address
                 if (instance.getAddress().equals(selfAddress)) {
                     instance.getAddress().setSelf(true);
                 } else {

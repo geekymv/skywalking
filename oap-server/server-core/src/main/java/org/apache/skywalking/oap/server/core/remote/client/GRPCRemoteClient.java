@@ -43,6 +43,7 @@ import org.apache.skywalking.oap.server.telemetry.api.MetricsTag;
 /**
  * This is a wrapper of the gRPC client for sending message to each other OAP server. It contains a block queue to
  * buffering the message and sending the message by batch.
+ * OAP 节点之间通信的 gRPC 客户端
  */
 @Slf4j
 public class GRPCRemoteClient implements RemoteClient {
@@ -96,7 +97,9 @@ public class GRPCRemoteClient implements RemoteClient {
     @Override
     public void connect() {
         if (!isConnect) {
+            // 建立连接
             this.getClient().connect();
+            // 消费本地队列中的数据
             this.getDataCarrier().consume(new RemoteMessageConsumer(), 1);
             this.isConnect = true;
         }
@@ -115,6 +118,7 @@ public class GRPCRemoteClient implements RemoteClient {
         if (Objects.isNull(client)) {
             synchronized (GRPCRemoteClient.class) {
                 if (Objects.isNull(client)) {
+                    // 创建 gRPC 客户端
                     this.client = new GRPCClient(address.getHost(), address.getPort(), sslContext);
                 }
             }
@@ -139,7 +143,7 @@ public class GRPCRemoteClient implements RemoteClient {
 
     /**
      * Push stream data which need to send to another OAP server.
-     *
+     * 发送数据给其他 OAP 节点
      * @param nextWorkerName the name of a worker which will process this stream data.
      * @param streamData     the entity contains the values.
      */
@@ -148,7 +152,7 @@ public class GRPCRemoteClient implements RemoteClient {
         RemoteMessage.Builder builder = RemoteMessage.newBuilder();
         builder.setNextWorkerName(nextWorkerName);
         builder.setRemoteData(streamData.serialize());
-
+        // 将数据发送到本地队列中
         this.getDataCarrier().produce(builder.build());
     }
 
@@ -163,6 +167,7 @@ public class GRPCRemoteClient implements RemoteClient {
                 StreamObserver<RemoteMessage> streamObserver = createStreamObserver();
                 for (RemoteMessage remoteMessage : remoteMessages) {
                     remoteOutCounter.inc();
+                    // 消费队列中的数据，发送给其他OAP节点
                     streamObserver.onNext(remoteMessage);
                 }
                 streamObserver.onCompleted();

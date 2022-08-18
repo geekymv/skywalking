@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class manages the connections between OAP servers. There is a task schedule that will automatically query a
  * server list from the cluster module. Such as Zookeeper cluster module or Kubernetes cluster module.
+ * 管理 OAP 节点之间的连接
  */
 public class RemoteClientManager implements Service {
 
@@ -93,6 +94,7 @@ public class RemoteClientManager implements Service {
 
     public void start() {
         Optional.ofNullable(sslContext).ifPresent(DynamicSslContext::start);
+        // 定时任务，查询 OAP service list， 每5s执行一次
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(this::refresh, 1, 5, TimeUnit.SECONDS);
     }
 
@@ -228,9 +230,11 @@ public class RemoteClientManager implements Service {
                     break;
                 case Create:
                     if (address.isSelf()) {
+                        // 是当前OAP节点自己，创建 SelfRemoteClient
                         RemoteClient client = new SelfRemoteClient(moduleDefineHolder, address);
                         newRemoteClients.add(client);
                     } else {
+                        // 创建 GRPCRemoteClient
                         RemoteClient client;
                         client = new GRPCRemoteClient(moduleDefineHolder, address, 1, 3000, remoteTimeout, sslContext);
                         client.connect();

@@ -343,6 +343,7 @@ public class CoreModuleProvider extends ModuleProvider {
             || CoreModuleConfig.Role.Aggregator.name()
                                                .equalsIgnoreCase(
                                                    moduleConfig.getRole())) {
+            // 当前OAP实例的角色是 Mixed 或 Aggregator，将自己注册到 cluster
             RemoteInstance gRPCServerInstance = new RemoteInstance(gRPCServerInstanceAddress);
             this.getManager()
                 .find(ClusterModule.NAME)

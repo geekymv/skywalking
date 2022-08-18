@@ -26,6 +26,7 @@ import org.apache.skywalking.oap.server.core.Const;
 public class Address implements Comparable<Address> {
     private final String host;
     private final int port;
+    // 判断 address 是否是当前OAP实例
     @Setter
     private volatile boolean isSelf;
 
