@@ -118,9 +118,11 @@ public class OALRuntime implements OALEngine {
     private final List<Class> dispatcherClasses;
     private final boolean openEngineDebug;
 
+    // 该构造方法在 OALEngineLoaderService#loadOALEngine 方法中通过反射的方式调用
     public OALRuntime(OALDefine define) {
         oalDefine = define;
         classPool = ClassPool.getDefault();
+        // freemarker 配置
         configuration = new Configuration(new Version("2.3.28"));
         configuration.setEncoding(Locale.ENGLISH, CLASS_FILE_CHARSET);
         configuration.setClassLoaderForTemplateLoading(OALRuntime.class.getClassLoader(), "/code-templates");
@@ -168,7 +170,7 @@ public class OALRuntime implements OALEngine {
         } catch (IOException e) {
             throw new ModuleStartException("OAL script parse analysis failure.", e);
         }
-
+        // 动态生成需要的类
         this.generateClassAtRuntime(oalScripts);
     }
 

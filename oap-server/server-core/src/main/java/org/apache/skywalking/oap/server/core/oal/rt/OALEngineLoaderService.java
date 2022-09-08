@@ -44,6 +44,7 @@ public class OALEngineLoaderService implements Service {
 
     /**
      * Normally it is invoked in the {@link ModuleProvider#start()} of the receiver-plugin module.
+     * 通常在 ModuleProvider#start() 方法中被调用
      */
     public void load(OALDefine define) throws ModuleStartException {
         if (oalDefineSet.contains(define)) {

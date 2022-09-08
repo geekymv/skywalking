@@ -52,6 +52,7 @@ import org.apache.skywalking.oap.server.library.module.ModuleDefineHolder;
  * {@link #in(Metrics)} provides the major entrance for metrics streaming calculation.
  *
  * {@link #create(ModuleDefineHolder, Stream, Class)} creates the workers and work flow for every metrics.
+ * 指标处理器
  */
 public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
     /**

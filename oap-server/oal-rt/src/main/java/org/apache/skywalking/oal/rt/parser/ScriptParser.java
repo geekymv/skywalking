@@ -29,6 +29,7 @@ import org.apache.skywalking.oal.rt.grammar.OALParser;
 
 /**
  * Script reader and parser.
+ * 读取 oal 文件，使用 Antlr 生成 Java 类进行解析
  */
 public class ScriptParser {
     private OALLexer lexer;
