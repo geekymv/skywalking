@@ -80,6 +80,7 @@ public class MetricsAggregateWorker extends AbstractWorker<Metrics> {
 
     /**
      * MetricsAggregateWorker#in operation does include enqueue only
+     * 将 metrics 放入 dataCarrier 队列
      */
     @Override
     public final void in(Metrics metrics) {
@@ -89,21 +90,23 @@ public class MetricsAggregateWorker extends AbstractWorker<Metrics> {
     /**
      * Dequeue consuming. According to {@link IConsumer#consume(List)}, this is a serial operation for every work
      * instance.
-     *
+     * 消费队列中的 metrics 数据
      * @param metricsList from the queue.
      */
     private void onWork(List<Metrics> metricsList) {
         metricsList.forEach(metrics -> {
             aggregationCounter.inc();
+            // 根据 metric id 做内存级别的数据聚合
             mergeDataCache.accept(metrics);
         });
-
+        // 根据 l1FlushPeriod 时间 判断是否要发送给下一个 worker
         flush();
     }
 
     private void flush() {
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastSendTime > l1FlushPeriod) {
+            // 从 mergeDataCache 读取所有的 metrics 发送给下一个 worker
             mergeDataCache.read().forEach(
                 data -> {
                     if (log.isDebugEnabled()) {
@@ -121,6 +124,10 @@ public class MetricsAggregateWorker extends AbstractWorker<Metrics> {
         public void init(final Properties properties) {
         }
 
+        /**
+         * 消费 metrics 数据
+         * @param data
+         */
         @Override
         public void consume(List<Metrics> data) {
             MetricsAggregateWorker.this.onWork(data);
