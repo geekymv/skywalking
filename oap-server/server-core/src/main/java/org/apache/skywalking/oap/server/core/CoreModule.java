@@ -87,6 +87,7 @@ public class CoreModule extends ModuleDefine {
         addCacheService(classes);
         addQueryService(classes);
         addProfileService(classes);
+        // 添加 OAL Service
         addOALService(classes);
         addManagementService(classes);
         addEBPFProfilingService(classes);

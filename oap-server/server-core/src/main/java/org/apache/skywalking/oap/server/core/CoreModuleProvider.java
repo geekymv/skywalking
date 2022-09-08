@@ -238,7 +238,7 @@ public class CoreModuleProvider extends ModuleProvider {
         this.registerServiceImplementation(HTTPHandlerRegister.class, new HTTPHandlerRegisterImpl(httpServer));
 
         this.registerServiceImplementation(IComponentLibraryCatalogService.class, new ComponentLibraryCatalogService());
-
+        // SourceReceiver 是对 DispatcherManager 的委托，将 source 转发给 SourceDispatcher
         this.registerServiceImplementation(SourceReceiver.class, receiver);
 
         WorkerInstancesService instancesService = new WorkerInstancesService();
@@ -281,6 +281,7 @@ public class CoreModuleProvider extends ModuleProvider {
         this.registerServiceImplementation(CommandService.class, new CommandService(getManager()));
 
         // add oal engine loader service implementations
+        // 添加 OAL Service 的实现
         oalEngineLoaderService = new OALEngineLoaderService(getManager());
         this.registerServiceImplementation(OALEngineLoaderService.class, oalEngineLoaderService);
 
