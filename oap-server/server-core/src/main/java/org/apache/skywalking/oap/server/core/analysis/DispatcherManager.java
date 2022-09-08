@@ -69,6 +69,7 @@ public class DispatcherManager implements DispatcherDetectorListener {
      * <p>
      * If it implement {@link org.apache.skywalking.oap.server.core.analysis.SourceDispatcher}, then, it will be added
      * into this DispatcherManager based on the Source definition.
+     * 扫描实现了 SourceDispatcher 接口的类
      */
     public void scan() throws IOException, IllegalAccessException, InstantiationException {
         ClassPath classpath = ClassPath.from(this.getClass().getClassLoader());

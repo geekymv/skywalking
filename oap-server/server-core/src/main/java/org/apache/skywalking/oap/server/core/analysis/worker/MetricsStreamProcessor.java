@@ -113,7 +113,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
 
     /**
      * Create the workers and work flow for every metrics.
-     *
+     * 对 metrics 创建 work flow
      * @param moduleDefineHolder pointer of the module define.
      * @param stream             definition of the metrics class.
      * @param metricsClass       data type of the streaming calculation.
@@ -125,6 +125,9 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         this.create(moduleDefineHolder, StreamDefinition.from(stream), metricsClass);
     }
 
+    /**
+     * 将多个 worker 串起来
+     */
     @SuppressWarnings("unchecked")
     public void create(ModuleDefineHolder moduleDefineHolder,
                        StreamDefinition stream,
@@ -132,9 +135,11 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         final StorageBuilderFactory storageBuilderFactory = moduleDefineHolder.find(StorageModule.NAME)
                                                                               .provider()
                                                                               .getService(StorageBuilderFactory.class);
+        // 获取 Metric 的存储构造（数据格式的转换），比如 InstanceJvmCpuMetrics 对应存储 InstanceJvmCpuMetricsBuilder
         final Class<? extends StorageBuilder> builder = storageBuilderFactory.builderOf(
             metricsClass, stream.getBuilder());
 
+        // 构造 metricsDAO
         StorageDAO storageDAO = moduleDefineHolder.find(StorageModule.NAME).provider().getService(StorageDAO.class);
         IMetricsDAO metricsDAO;
         try {
@@ -144,6 +149,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         }
 
         ModelCreator modelSetter = moduleDefineHolder.find(CoreModule.NAME).provider().getService(ModelCreator.class);
+        // 获取采样配置
         DownSamplingConfigService configService = moduleDefineHolder.find(CoreModule.NAME)
                                                                     .provider()
                                                                     .getService(DownSamplingConfigService.class);
@@ -166,21 +172,25 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
             timeRelativeID = metricsExtension.timeRelativeID();
         }
         if (supportDownSampling) {
+            // Hour
             if (configService.shouldToHour()) {
                 Model model = modelSetter.add(
                     metricsClass, stream.getScopeId(), new Storage(stream.getName(), timeRelativeID, DownSampling.Hour),
                     false
                 );
+                // 小时级别存储
                 hourPersistentWorker = downSamplingWorker(moduleDefineHolder, metricsDAO, model, supportUpdate);
             }
+            // Day
             if (configService.shouldToDay()) {
                 Model model = modelSetter.add(
                     metricsClass, stream.getScopeId(), new Storage(stream.getName(), timeRelativeID, DownSampling.Day),
                     false
                 );
+                // 天级别存储
                 dayPersistentWorker = downSamplingWorker(moduleDefineHolder, metricsDAO, model, supportUpdate);
             }
-
+            // MetricsTransWorker 包括 hourPersistentWorker 和 dayPersistentWorker
             transWorker = new MetricsTransWorker(
                 moduleDefineHolder, hourPersistentWorker, dayPersistentWorker);
         }
@@ -189,16 +199,20 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
             metricsClass, stream.getScopeId(), new Storage(stream.getName(), timeRelativeID, DownSampling.Minute),
             false
         );
+        // 分钟级别存储
         MetricsPersistentWorker minutePersistentWorker = minutePersistentWorker(
             moduleDefineHolder, metricsDAO, model, transWorker, supportUpdate);
 
+        // 注册 RemoteHandleWorker
         String remoteReceiverWorkerName = stream.getName() + "_rec";
         IWorkerInstanceSetter workerInstanceSetter = moduleDefineHolder.find(CoreModule.NAME)
                                                                        .provider()
                                                                        .getService(IWorkerInstanceSetter.class);
+        // 设置分钟级别存储 worker
         workerInstanceSetter.put(remoteReceiverWorkerName, minutePersistentWorker, metricsClass);
 
         MetricsRemoteWorker remoteWorker = new MetricsRemoteWorker(moduleDefineHolder, remoteReceiverWorkerName);
+        // 创建聚合worker，并设置 next worker 为 remoteWorker
         MetricsAggregateWorker aggregateWorker = new MetricsAggregateWorker(
             moduleDefineHolder, remoteWorker, stream.getName(), l1FlushPeriod);
 
@@ -210,7 +224,9 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
                                                            Model model,
                                                            MetricsTransWorker transWorker,
                                                            boolean supportUpdate) {
+        // 告警通知 worker
         AlarmNotifyWorker alarmNotifyWorker = new AlarmNotifyWorker(moduleDefineHolder);
+        // 导出 worker
         ExportWorker exportWorker = new ExportWorker(moduleDefineHolder);
 
         MetricsPersistentWorker minutePersistentWorker = new MetricsPersistentWorker(
@@ -226,6 +242,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
                                                        IMetricsDAO metricsDAO,
                                                        Model model,
                                                        boolean supportUpdate) {
+        // Metrics 数据存储
         MetricsPersistentWorker persistentWorker = new MetricsPersistentWorker(
             moduleDefineHolder, model, metricsDAO,
             enableDatabaseSession, supportUpdate, storageSessionTimeout, metricsDataTTL

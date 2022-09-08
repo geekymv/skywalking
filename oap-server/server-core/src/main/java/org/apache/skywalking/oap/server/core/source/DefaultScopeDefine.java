@@ -54,7 +54,7 @@ public class DefaultScopeDefine {
     public static final int SERVICE_RELATION = 4;
     public static final int SERVICE_INSTANCE_RELATION = 5;
     public static final int ENDPOINT_RELATION = 6;
-    public static final int SERVICE_INSTANCE_JVM_CPU = 8;
+    public static final int SERVICE_INSTANCE_JVM_CPU = 8; // SERVICE_INSTANCE 的二级 Scope
     public static final int SERVICE_INSTANCE_JVM_MEMORY = 9;
     public static final int SERVICE_INSTANCE_JVM_MEMORY_POOL = 10;
     public static final int SERVICE_INSTANCE_JVM_GC = 11;

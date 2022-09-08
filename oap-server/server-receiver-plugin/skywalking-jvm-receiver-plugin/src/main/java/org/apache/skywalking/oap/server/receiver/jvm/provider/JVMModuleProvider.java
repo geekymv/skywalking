@@ -63,6 +63,7 @@ public class JVMModuleProvider extends ModuleProvider {
                                                               .provider()
                                                               .getService(GRPCHandlerRegister.class);
         JVMMetricReportServiceHandler jvmMetricReportServiceHandler = new JVMMetricReportServiceHandler(getManager());
+        // 添加 gRPC Handler
         grpcHandlerRegister.addHandler(jvmMetricReportServiceHandler);
         grpcHandlerRegister.addHandler(new JVMMetricReportServiceHandlerCompat(jvmMetricReportServiceHandler));
     }

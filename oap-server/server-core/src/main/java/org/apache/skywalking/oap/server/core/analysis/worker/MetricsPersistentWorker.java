@@ -49,6 +49,7 @@ import org.apache.skywalking.oap.server.telemetry.api.MetricsTag;
 
 /**
  * MetricsPersistentWorker is an extension of {@link PersistenceWorker} and focuses on the Metrics data persistent.
+ * Metrics 数据的分钟级别存储
  */
 @Slf4j
 public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {

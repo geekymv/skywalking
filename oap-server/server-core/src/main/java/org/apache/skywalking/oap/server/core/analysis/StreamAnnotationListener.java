@@ -58,6 +58,7 @@ public class StreamAnnotationListener implements AnnotationListener {
             if (stream.processor().equals(RecordStreamProcessor.class)) {
                 RecordStreamProcessor.getInstance().create(moduleDefineHolder, stream, aClass);
             } else if (stream.processor().equals(MetricsStreamProcessor.class)) {
+                // 创建 Metrics work flow
                 MetricsStreamProcessor.getInstance().create(moduleDefineHolder, stream, aClass);
             } else if (stream.processor().equals(TopNStreamProcessor.class)) {
                 TopNStreamProcessor.getInstance().create(moduleDefineHolder, stream, aClass);

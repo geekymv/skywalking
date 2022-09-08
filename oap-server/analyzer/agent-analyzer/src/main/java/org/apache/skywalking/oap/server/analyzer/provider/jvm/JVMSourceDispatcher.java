@@ -48,7 +48,7 @@ public class JVMSourceDispatcher {
     public JVMSourceDispatcher(ModuleManager moduleManager) {
         this.sourceReceiver = moduleManager.find(CoreModule.NAME).provider().getService(SourceReceiver.class);
     }
-
+    // 发送 Metric
     public void sendMetric(String service, String serviceInstance, JVMMetric metrics) {
         long minuteTimeBucket = TimeBucket.getMinuteTimeBucket(metrics.getTime());
 
@@ -84,6 +84,7 @@ public class JVMSourceDispatcher {
         double adjustedCpuUsagePercent = Math.max(cpu.getUsagePercent(), 1.0);
         serviceInstanceJVMCPU.setUsePercent(adjustedCpuUsagePercent);
         serviceInstanceJVMCPU.setTimeBucket(timeBucket);
+        // 转发给 ServiceInstanceJVMCPUDispatcher（OAL生成的） 处理
         sourceReceiver.receive(serviceInstanceJVMCPU);
     }
 
