@@ -264,6 +264,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
                         // 将 metrics 批量存储
                         prepareRequests.add(metricsDAO.prepareBatchInsert(model, metrics));
                     }
+                    // 告警和导出 worker
                     nextWorker(metrics);
                     metrics.setLastUpdateTimestamp(timestamp);
                 }
@@ -363,6 +364,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
 
         @Override
         public void consume(List<Metrics> data) {
+            // 将数据写入缓存，metrics L2 Aggregation
             MetricsPersistentWorker.this.onWork(data);
         }
 
