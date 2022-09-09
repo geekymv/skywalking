@@ -63,6 +63,7 @@ public class MergableBufferedData<METRICS extends Metrics> implements BufferedDa
         try {
             return buffer.values().stream().collect(Collectors.toList());
         } finally {
+            // 从缓存中取出所有数据之后，清空缓存
             buffer.clear();
         }
     }
