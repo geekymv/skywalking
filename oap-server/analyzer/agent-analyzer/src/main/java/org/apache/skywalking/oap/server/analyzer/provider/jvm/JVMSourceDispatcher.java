@@ -50,6 +50,7 @@ public class JVMSourceDispatcher {
     }
     // 发送 Metric
     public void sendMetric(String service, String serviceInstance, JVMMetric metrics) {
+        // metrics.getTime() 由 agent 端设置，就是 System.currentTimeMillis();
         long minuteTimeBucket = TimeBucket.getMinuteTimeBucket(metrics.getTime());
 
         final String serviceId = IDManager.ServiceID.buildId(service, true);
