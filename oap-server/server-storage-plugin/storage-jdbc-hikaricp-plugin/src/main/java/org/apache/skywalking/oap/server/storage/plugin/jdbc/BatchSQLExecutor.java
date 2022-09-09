@@ -44,6 +44,7 @@ public class BatchSQLExecutor implements InsertRequest, UpdateRequest {
         if (prepareRequests.size() == 0) {
             return;
         }
+        // 获取 sql，批量执行
         String sql = prepareRequests.get(0).toString();
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             int pendingCount = 0;

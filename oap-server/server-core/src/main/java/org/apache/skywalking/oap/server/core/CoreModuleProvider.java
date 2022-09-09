@@ -243,7 +243,9 @@ public class CoreModuleProvider extends ModuleProvider {
         this.registerServiceImplementation(SourceReceiver.class, receiver);
 
         WorkerInstancesService instancesService = new WorkerInstancesService();
+        // 查找 worker instance
         this.registerServiceImplementation(IWorkerInstanceGetter.class, instancesService);
+        // 设置 worker instance
         this.registerServiceImplementation(IWorkerInstanceSetter.class, instancesService);
 
         this.registerServiceImplementation(RemoteSenderService.class, new RemoteSenderService(getManager()));
@@ -323,6 +325,7 @@ public class CoreModuleProvider extends ModuleProvider {
 
     @Override
     public void start() throws ModuleStartException {
+        // 处理其他 OAP 节点发送过来的数据
         grpcServer.addHandler(new RemoteServiceHandler(getManager()));
         grpcServer.addHandler(new HealthCheckServiceHandler());
         remoteClientManager.start();
@@ -376,7 +379,7 @@ public class CoreModuleProvider extends ModuleProvider {
         } catch (ServerException e) {
             throw new ModuleStartException(e.getMessage(), e);
         }
-
+        // 数据持久化定时器
         PersistenceTimer.INSTANCE.start(getManager(), moduleConfig);
 
         if (moduleConfig.isEnableDataKeeperExecutor()) {

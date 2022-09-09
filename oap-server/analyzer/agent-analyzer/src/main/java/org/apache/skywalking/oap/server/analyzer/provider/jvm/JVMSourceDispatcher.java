@@ -55,8 +55,10 @@ public class JVMSourceDispatcher {
         final String serviceId = IDManager.ServiceID.buildId(service, true);
         final String serviceInstanceId = IDManager.ServiceInstanceID.buildId(serviceId, serviceInstance);
 
+        // CPU
         this.sendToCpuMetricProcess(
             service, serviceId, serviceInstance, serviceInstanceId, minuteTimeBucket, metrics.getCpu());
+        // Memory
         this.sendToMemoryMetricProcess(
             service, serviceId, serviceInstance, serviceInstanceId, minuteTimeBucket, metrics.getMemoryList());
         this.sendToMemoryPoolMetricProcess(

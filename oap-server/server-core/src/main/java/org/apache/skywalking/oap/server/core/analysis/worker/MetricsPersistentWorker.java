@@ -49,7 +49,7 @@ import org.apache.skywalking.oap.server.telemetry.api.MetricsTag;
 
 /**
  * MetricsPersistentWorker is an extension of {@link PersistenceWorker} and focuses on the Metrics data persistent.
- * Metrics 数据的分钟级别存储
+ * Metrics 数据的存储
  */
 @Slf4j
 public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
@@ -182,7 +182,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
         if (persistentCounter++ % persistentMod != 0) {
             return Collections.emptyList();
         }
-
+        // 从缓存中读取所有数据
         final List<Metrics> lastCollection = getCache().read();
 
         long start = System.currentTimeMillis();
@@ -198,11 +198,13 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
         List<Metrics> metricsList = new ArrayList<>();
         List<PrepareRequest> prepareRequests = new ArrayList<>(lastCollection.size());
         for (Metrics data : lastCollection) {
+            // hourPersistenceWorker、dayPersistenceWorker
             transWorker.ifPresent(metricsTransWorker -> metricsTransWorker.in(data));
 
             metricsList.add(data);
 
             if (metricsList.size() == batchSize) {
+                // 将 Metrics 数据写入存储
                 flushDataToStorage(metricsList, prepareRequests);
             }
         }
@@ -253,11 +255,13 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
                     nextWorker(cachedMetrics);
                     cachedMetrics.setLastUpdateTimestamp(timestamp);
                 } else {
+                    // 计算 metrics value
                     metrics.calculate();
                     if (skipDefaultValueMetric && metrics.haveDefault() && metrics.isDefaultValue()) {
                         // Skip metrics in default value
                         skippedMetricsCounter.inc();
                     } else {
+                        // 将 metrics 批量存储
                         prepareRequests.add(metricsDAO.prepareBatchInsert(model, metrics));
                     }
                     nextWorker(metrics);
@@ -273,6 +277,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
         } catch (Throwable t) {
             log.error(t.getMessage(), t);
         } finally {
+            // 将 list 清空
             metricsList.clear();
         }
     }

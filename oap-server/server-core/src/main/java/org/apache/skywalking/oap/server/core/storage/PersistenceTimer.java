@@ -81,9 +81,10 @@ public enum PersistenceTimer {
             "persistence_timer_bulk_all_latency", "Latency of the all stage in persistence timer",
             MetricsTag.EMPTY_KEY, MetricsTag.EMPTY_VALUE
         );
-
+        // 创建固定线程大小的线程池
         prepareExecutorService = Executors.newFixedThreadPool(moduleConfig.getPrepareThreads());
         if (!isStarted) {
+            // 创建定时任务，每25s 执行 extractDataAndSave
             Executors.newSingleThreadScheduledExecutor()
                      .scheduleWithFixedDelay(
                          new RunnableWithExceptionProtection(
@@ -113,6 +114,7 @@ public enum PersistenceTimer {
                 return CompletableFuture.runAsync(() -> {
                     List<PrepareRequest> innerPrepareRequests;
                     // Prepare stage
+                    // 准备阶段
                     try (HistogramMetrics.Timer ignored = prepareLatency.createTimer()) {
                         if (log.isDebugEnabled()) {
                             log.debug(
@@ -120,7 +122,7 @@ public enum PersistenceTimer {
                                 worker.getClass().getName()
                             );
                         }
-
+                        // 批量获取 TopN、 Metric 数据
                         innerPrepareRequests = worker.buildBatchRequests();
 
                         worker.endOfRound();
@@ -131,6 +133,7 @@ public enum PersistenceTimer {
                     }
 
                     // Execution stage
+                    // 执行阶段
                     HistogramMetrics.Timer executeLatencyTimer = executeLatency.createTimer();
                     batchDAO.flush(innerPrepareRequests)
                             .whenComplete(($1, $2) -> executeLatencyTimer.close());

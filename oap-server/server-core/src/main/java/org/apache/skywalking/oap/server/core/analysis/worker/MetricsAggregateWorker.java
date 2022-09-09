@@ -112,6 +112,7 @@ public class MetricsAggregateWorker extends AbstractWorker<Metrics> {
                     if (log.isDebugEnabled()) {
                         log.debug(data.toString());
                     }
+                    // nextWorker 是 MetricsRemoteWorker，将 metric 发送给目标 OAP 节点
                     nextWorker.in(data);
                 }
             );
