@@ -59,6 +59,9 @@ public class H2TableInstaller extends ModelInstaller {
         return false;
     }
 
+    /**
+     * 创建表结构
+     */
     @Override
     protected void createTable(Model model) throws StorageException {
         JDBCHikariCPClient jdbcHikariCPClient = (JDBCHikariCPClient) client;
@@ -147,7 +150,7 @@ public class H2TableInstaller extends ModelInstaller {
             tableCreateSQL.appendLine(
                 getColumn(column) + (i != columns.size() - 1 ? "," : ""));
         }
-        tableCreateSQL.appendLine(")");
+        tableCreateSQL.appendLine(") ROW_FORMAT = DYNAMIC");
 
         if (log.isDebugEnabled()) {
             log.debug("creating table: " + tableCreateSQL.toStringInNewLine());
