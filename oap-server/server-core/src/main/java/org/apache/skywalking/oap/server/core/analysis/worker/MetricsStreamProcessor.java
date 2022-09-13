@@ -195,6 +195,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
                 moduleDefineHolder, hourPersistentWorker, dayPersistentWorker);
         }
 
+        // stream.getName() 表的名字，比如 InstanceJvmMemoryHeapMetrics 对应的 instance_jvm_memory_heap
         Model model = modelSetter.add(
             metricsClass, stream.getScopeId(), new Storage(stream.getName(), timeRelativeID, DownSampling.Minute),
             false

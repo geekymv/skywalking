@@ -61,10 +61,10 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         SQLDatabaseModelExtension sqlDBModelExtension = new SQLDatabaseModelExtension();
         retrieval(aClass, storage.getModelName(), modelColumns, scopeId, checker, sqlDBModelExtension, record);
         checker.check(storage.getModelName());
-
+        // 创建 model
         Model model = new Model(
-            storage.getModelName(),
-            modelColumns,
+            storage.getModelName(), // 表名
+            modelColumns, // 列名
             scopeId,
             storage.getDownsampling(),
             record,
@@ -78,6 +78,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         models.add(model);
 
         for (final CreatingListener listener : listeners) {
+            // 创建表结构（对于 MySQL）
             listener.whenCreating(model);
         }
         return model;
@@ -116,6 +117,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         Field[] fields = clazz.getDeclaredFields();
 
         for (Field field : fields) {
+            // 查找 Column 注解
             if (field.isAnnotationPresent(Column.class)) {
                 if (field.isAnnotationPresent(SQLDatabase.AdditionalEntity.class)) {
                     if (!record) {
@@ -126,6 +128,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
                 Column column = field.getAnnotation(Column.class);
                 // Use the column#length as the default column length, as read the system env as the override mechanism.
                 // Log the error but don't block the startup sequence.
+                // 使用系统环境变量值覆盖 length
                 int columnLength = column.length();
                 final String lengthEnvVariable = column.lengthEnvVariable();
                 if (StringUtil.isNotEmpty(lengthEnvVariable)) {
@@ -179,7 +182,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
                     banyanDBGlobalIndex == null ? false : true,
                     banyanDBNoIndex != null ? false : column.storageOnly()
                 );
-
+                // 创建 model column
                 final ModelColumn modelColumn = new ModelColumn(
                     new ColumnName(
                         modelName,
@@ -223,6 +226,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         }
 
         if (Objects.nonNull(clazz.getSuperclass())) {
+            // 递归父类字段
             retrieval(clazz.getSuperclass(), modelName, modelColumns, scopeId, checker, sqlDBModelExtension, record);
         }
     }
