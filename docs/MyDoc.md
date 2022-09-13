@@ -15,4 +15,10 @@ OALEngineLoaderService -调用 OALRuntime#notifyAllListeners 方法  -> StreamAn
 MetricsStreamProcessor 负责将 Metrics 的所有 worker 串起来
 
 MetricsAggregateWorker（L1聚合） -> MetricsRemoteWorker（将 metrics 发送给目标 OAP 节点）
-（另一个 OAP 节点）RemoteHandleWorker -> MetricsPersistentWorker
+
+（集群模式下另一个 OAP 节点）RemoteServiceHandler -> RemoteHandleWorker -> MetricsPersistentWorker -> DataCarrier 内存队列
+- RemoteServiceHandler 接收其他节点发送过来的数据，
+  
+PersistentConsumer 消费 DataCarrier -> 将数据写入 ReadWriteSafeCache
+
+PersistenceTimer 数据持久化定时器
