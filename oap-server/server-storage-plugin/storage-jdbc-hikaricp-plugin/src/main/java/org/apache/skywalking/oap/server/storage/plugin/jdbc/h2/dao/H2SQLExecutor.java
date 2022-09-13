@@ -112,13 +112,16 @@ public class H2SQLExecutor {
                                                                     StorageBuilder<T> storageBuilder,
                                                                     Convert2Storage<Map<String, Object>> converter) throws IOException {
         Model model = TableMetaInfo.get(modelName);
+        // 比如 InstanceJvmMemoryHeapMetricsBuilder
         storageBuilder.entity2Storage(metrics, converter);
         Map<String, Object> objectMap = converter.obtain();
         //build main table sql
         Map<String, Object> mainEntity = new HashMap<>();
         model.getColumns().forEach(column -> {
+            // objectMap.get() 获取 column 对应的值
             mainEntity.put(column.getColumnName().getName(), objectMap.get(column.getColumnName().getName()));
         });
+        // 构造 insert sql
         SQLExecutor sqlExecutor = buildInsertExecutor(
             modelName, model.getColumns(), metrics, mainEntity);
         //build additional table sql
@@ -145,7 +148,7 @@ public class H2SQLExecutor {
         SQLBuilder sqlBuilder = new SQLBuilder("INSERT INTO " + tableName + " VALUES");
         List<Object> param = new ArrayList<>();
         sqlBuilder.append("(?,");
-        param.add(metrics.id());
+        param.add(metrics.id()); // id
         for (int i = 0; i < columns.size(); i++) {
             ModelColumn column = columns.get(i);
                 sqlBuilder.append("?");

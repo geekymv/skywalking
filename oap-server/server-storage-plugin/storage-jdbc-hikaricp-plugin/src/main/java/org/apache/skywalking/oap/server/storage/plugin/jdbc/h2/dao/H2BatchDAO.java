@@ -74,7 +74,7 @@ public class H2BatchDAO implements IBatchDAO {
         if (log.isDebugEnabled()) {
             log.debug("to execute sql statements execute, data size: {}, maxBatchSqlSize: {}", sqls.size(), maxBatchSqlSize);
         }
-
+        // 根据 sql 分组
         final Map<PrepareRequest, List<PrepareRequest>> batchRequestMap =
             sqls.stream().collect(Collectors.groupingBy(Function.identity()));
         try (Connection connection = h2Client.getConnection()) {
@@ -82,6 +82,7 @@ public class H2BatchDAO implements IBatchDAO {
                 try {
                     BatchSQLExecutor batchSQLExecutor =
                             new BatchSQLExecutor(requests);
+                    // 批量执行 SQL 保存 Metric 数据
                     batchSQLExecutor.invoke(connection, maxBatchSqlSize);
                 } catch (SQLException e) {
                     // Just avoid one execution failure makes the rest of batch failure.

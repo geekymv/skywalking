@@ -46,13 +46,15 @@ public class BatchSQLExecutor implements InsertRequest, UpdateRequest {
         }
         // 获取 sql，批量执行
         String sql = prepareRequests.get(0).toString();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) { // 构造 sql
             int pendingCount = 0;
             for (int k = 0; k < prepareRequests.size(); k++) {
                 SQLExecutor sqlExecutor = (SQLExecutor) prepareRequests.get(k);
+                // 设置 sql 参数
                 sqlExecutor.setParameters(preparedStatement);
                 preparedStatement.addBatch();
                 if (k > 0 && k % maxBatchSqlSize == 0) {
+                    // 批量执行
                     executeBatch(preparedStatement, maxBatchSqlSize, sql);
                     pendingCount = 0;
                 } else {
