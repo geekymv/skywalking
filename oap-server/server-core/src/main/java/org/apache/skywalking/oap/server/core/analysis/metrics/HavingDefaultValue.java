@@ -24,6 +24,7 @@ package org.apache.skywalking.oap.server.core.analysis.metrics;
  *
  * For the declared metrics, the OAP server would skip the persistence of minute dimensionality metrics to reduce
  * resource costs for the database, when the value of the metric is the default.
+ * Metric 有默认值，当前值是默认值的分钟级别的 Metric 不会被存储
  */
 public interface HavingDefaultValue {
     /**
