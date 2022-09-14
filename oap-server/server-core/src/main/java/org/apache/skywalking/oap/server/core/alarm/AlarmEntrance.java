@@ -41,6 +41,7 @@ public class AlarmEntrance {
 
     private void init() {
         if (metricsNotify == null) {
+            // 获取 MetricsNotify 服务
             metricsNotify = moduleDefineHolder.find(AlarmModule.NAME).provider().getService(MetricsNotify.class);
         }
     }

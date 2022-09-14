@@ -170,6 +170,7 @@ public class RunningRule {
         if (valueType != null) {
             // 创建 metric window
             Window window = windows.computeIfAbsent(meta, ignored -> new Window(period));
+            // 将 metrics 放入滑动窗口
             window.add(metrics);
         }
     }
