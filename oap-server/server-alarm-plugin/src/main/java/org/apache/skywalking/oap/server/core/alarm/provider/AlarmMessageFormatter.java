@@ -77,6 +77,7 @@ public class AlarmMessageFormatter {
         for (int i = 0; i < formatSegments.size(); i++) {
             message.append(formatSegments.get(i));
             if (i != formatSegments.size() - 1) {
+                // 用实际值取代 {id} 和 {name}
                 switch (valueFroms.get(i)) {
                     case ID:
                         message.append(meta.getId0());
