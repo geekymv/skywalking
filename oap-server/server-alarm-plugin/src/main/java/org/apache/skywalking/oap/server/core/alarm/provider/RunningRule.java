@@ -61,6 +61,7 @@ public class RunningRule {
     private final String metricsName;
     private final Threshold threshold;
     private final OP op;
+    // 达到阈值的次数
     private final int countThreshold;
     private final int silencePeriod;
     private final Map<MetaInAlarm, Window> windows;
@@ -167,6 +168,7 @@ public class RunningRule {
         }
 
         if (valueType != null) {
+            // 创建 metric window
             Window window = windows.computeIfAbsent(meta, ignored -> new Window(period));
             window.add(metrics);
         }
@@ -232,6 +234,7 @@ public class RunningRule {
         List<AlarmMessage> alarmMessageList = new ArrayList<>(30);
 
         windows.forEach((meta, window) -> {
+            // 判断是否满足触发告警条件
             Optional<AlarmMessage> alarmMessageOptional = window.checkAlarm();
             if (alarmMessageOptional.isPresent()) {
                 AlarmMessage alarmMessage = alarmMessageOptional.get();
@@ -241,6 +244,7 @@ public class RunningRule {
                 alarmMessage.setId0(meta.getId0());
                 alarmMessage.setId1(meta.getId1());
                 alarmMessage.setRuleName(this.ruleName);
+                // 格式化告警消息
                 alarmMessage.setAlarmMessage(formatter.format(meta));
                 alarmMessage.setOnlyAsCondition(this.onlyAsCondition);
                 alarmMessage.setStartTime(System.currentTimeMillis());
@@ -256,6 +260,7 @@ public class RunningRule {
     /**
      * A metrics window, based on AlarmRule#period. This window slides with time, just keeps the recent N(period)
      * buckets.
+     * metrics 窗口
      */
     public class Window {
         private LocalDateTime endTime;
@@ -272,6 +277,9 @@ public class RunningRule {
             init();
         }
 
+        /**
+         * 滑动窗口
+         */
         public void moveTo(LocalDateTime current) {
             lock.lock();
             try {
@@ -358,6 +366,7 @@ public class RunningRule {
             return Optional.empty();
         }
 
+        // 判断是否满足触发告警条件
         private boolean isMatch() {
             int matchCount = 0;
             for (Metrics metrics : values) {

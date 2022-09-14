@@ -46,10 +46,15 @@ public class AlarmRule {
     private String includeLabelsRegex;
     private ArrayList<String> excludeLabels;
     private String excludeLabelsRegex;
+    // 阈值
     private String threshold;
+    // 条件 >、>=、<、<=、== 等
     private String op;
+    // 单位：分钟
     private int period;
+    // 达到多少次后发送告警消息
     private int count;
+    // 静默时间，默认同 period
     private int silencePeriod;
     private String message;
     private boolean onlyAsCondition;

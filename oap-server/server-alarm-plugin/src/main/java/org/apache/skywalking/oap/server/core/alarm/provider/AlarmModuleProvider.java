@@ -62,11 +62,13 @@ public class AlarmModuleProvider extends ModuleProvider {
             throw new ModuleStartException("can't load alarm-settings.yml", e);
         }
         RulesReader reader = new RulesReader(applicationReader);
+        // 读取告警规则
         Rules rules = reader.readRules();
 
         alarmRulesWatcher = new AlarmRulesWatcher(rules, this);
 
         notifyHandler = new NotifyHandler(alarmRulesWatcher, getManager());
+        // 初始化告警回调
         notifyHandler.init(new AlarmStandardPersistence(getManager()));
         this.registerServiceImplementation(MetricsNotify.class, notifyHandler);
     }

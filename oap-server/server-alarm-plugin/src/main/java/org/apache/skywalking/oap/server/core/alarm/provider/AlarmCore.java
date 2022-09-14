@@ -52,6 +52,7 @@ public class AlarmCore {
     public void start(List<AlarmCallback> allCallbacks) {
         LocalDateTime now = LocalDateTime.now();
         lastExecuteTime = now;
+        // 定时任务每10s执行一次
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
                 final List<AlarmMessage> alarmMessageList = new ArrayList<>(30);
@@ -66,6 +67,7 @@ public class AlarmCore {
                          */
                         if (checkTime.getSecondOfMinute() > 15) {
                             hasExecute[0] = true;
+                            // 告警检测
                             alarmMessageList.addAll(runningRule.check());
                         }
                     }
@@ -82,6 +84,7 @@ public class AlarmCore {
                     }
                     List<AlarmMessage> filteredMessages = alarmMessageList.stream().filter(msg -> !msg.isOnlyAsCondition()).collect(Collectors.toList());
                     if (!filteredMessages.isEmpty()) {
+                        // 执行回调，发送告警消息
                         allCallbacks.forEach(callback -> callback.doAlarm(filteredMessages));
                     }
                 }

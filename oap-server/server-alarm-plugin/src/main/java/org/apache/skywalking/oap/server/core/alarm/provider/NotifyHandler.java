@@ -58,6 +58,9 @@ public class NotifyHandler implements MetricsNotify {
         this.manager = manager;
     }
 
+    /**
+     * 通知处理
+     */
     @Override
     public void notify(Metrics metrics) {
         WithMetadata withMetadata = (WithMetadata) metrics;
@@ -166,12 +169,12 @@ public class NotifyHandler implements MetricsNotify {
         } else {
             return;
         }
-
+        // 根据 metricsName 获取告警规则
         List<RunningRule> runningRules = core.findRunningRule(meta.getMetricsName());
         if (runningRules == null) {
             return;
         }
-
+        // 遍历告警规则
         runningRules.forEach(rule -> rule.in(metaInAlarm, metrics));
     }
 
@@ -185,6 +188,7 @@ public class NotifyHandler implements MetricsNotify {
         allCallbacks.add(new FeishuHookCallback(alarmRulesWatcher));
         allCallbacks.add(new EventHookCallback(this.manager));
         allCallbacks.add(new WeLinkHookCallback(alarmRulesWatcher));
+        // 启动告警
         core.start(allCallbacks);
     }
 }

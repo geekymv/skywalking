@@ -84,6 +84,7 @@ public class RulesReader {
         }
         rules.setRules(new ArrayList<>());
         rulesData.forEach((k, v) -> {
+            // 规则名称以 _rule 结尾
             if (((String) k).endsWith("_rule")) {
                 AlarmRule alarmRule = new AlarmRule();
                 alarmRule.setAlarmRuleName((String) k);

@@ -36,6 +36,7 @@ import java.util.List;
 
 /**
  * Save the alarm info into storage for UI query.
+ * 告警信息存储
  */
 public class AlarmStandardPersistence implements AlarmCallback {
 
