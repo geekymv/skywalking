@@ -113,6 +113,7 @@ public class MeterSystem implements Service {
         if (meterFunction == null) {
             throw new IllegalArgumentException("Function " + functionName + " can't be found.");
         }
+        // AcceptableValue 接口的泛型类型
         Type acceptance = null;
         for (final Type genericInterface : meterFunction.getGenericInterfaces()) {
             if (genericInterface instanceof ParameterizedType) {
@@ -247,6 +248,7 @@ public class MeterSystem implements Service {
 
             log.debug("Generate metrics class, " + metricsClass.getName());
 
+            // 创建 metrics 的 work flow
             MetricsStreamProcessor.getInstance().create(
                 manager,
                 new StreamDefinition(
