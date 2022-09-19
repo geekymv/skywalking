@@ -27,6 +27,9 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 
+/**
+ * 柱状图
+ */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Getter

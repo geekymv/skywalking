@@ -24,6 +24,9 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 
+/**
+ * 单调递增的计数器，重新启动时值重置为0，比如 HTTP 请求数
+ */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Getter

@@ -24,6 +24,9 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 
+/**
+ * 百分位
+ */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Getter

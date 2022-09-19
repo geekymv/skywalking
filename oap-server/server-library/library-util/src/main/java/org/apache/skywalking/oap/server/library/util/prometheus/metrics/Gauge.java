@@ -24,6 +24,9 @@ import lombok.Getter;
 import lombok.Singular;
 import lombok.ToString;
 
+/**
+ * 任意上下波动数值，比如 CPU 使用率
+ */
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Getter
