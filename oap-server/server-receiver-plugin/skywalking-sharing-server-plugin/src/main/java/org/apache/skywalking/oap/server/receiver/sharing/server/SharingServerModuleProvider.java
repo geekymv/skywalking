@@ -144,6 +144,7 @@ public class SharingServerModuleProvider extends ModuleProvider {
         }
 
         if (Objects.nonNull(receiverGRPCHandlerRegister)) {
+            // 使用 core 模块的 GRPCHandlerRegister 实现
             receiverGRPCHandlerRegister.setGrpcHandlerRegister(getManager().find(CoreModule.NAME)
                                                                            .provider()
                                                                            .getService(GRPCHandlerRegister.class));

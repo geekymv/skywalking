@@ -41,6 +41,7 @@ public interface Handler {
         List<Handler> result = new ArrayList<>();
         for (ClassPath.ClassInfo each : classes) {
             Class<?> c = each.load();
+            // 判断 c 是否实现 Handler 接口
             if (Arrays.stream(c.getInterfaces()).anyMatch(interfaceClass -> interfaceClass.isAssignableFrom(Handler.class))) {
                 try {
                     result.add((Handler) c.getDeclaredConstructor().newInstance());

@@ -52,6 +52,7 @@ import static org.apache.skywalking.oap.meter.analyzer.Analyzer.NIL;
 
 /**
  * PrometheusMetricConverter converts prometheus metrics to meter-system metrics, then store them to backend storage.
+ * 将 prometheus metrics 转换成 meter-system metrics
  */
 @Slf4j
 public class PrometheusMetricConverter {

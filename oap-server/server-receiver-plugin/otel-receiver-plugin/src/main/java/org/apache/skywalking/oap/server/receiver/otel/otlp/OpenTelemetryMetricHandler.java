@@ -80,8 +80,8 @@ public class OpenTelemetryMetricHandler
         final List<String> enabledRules =
             Splitter.on(",")
                 .omitEmptyStrings()
-                .splitToList(config.getEnabledOtelRules());
-        final List<Rule> rules = Rules.loadRules("otel-rules", enabledRules);
+                .splitToList(config.getEnabledOtelRules()); // application.yml 中的配置 receiver-otel
+        final List<Rule> rules = Rules.loadRules("otel-rules", enabledRules); // 读取 otel-rules 目录下的配置
 
         if (rules.isEmpty()) {
             return;
@@ -91,7 +91,7 @@ public class OpenTelemetryMetricHandler
             .stream()
             .map(r -> new PrometheusMetricConverter(r, service))
             .collect(toList());
-
+        // 注册 Handler
         grpcHandlerRegister.addHandler(this);
     }
 
