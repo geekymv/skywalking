@@ -46,6 +46,11 @@ public class HistoryDeleteEsDAO extends EsDAO implements IHistoryDeleteDAO {
                  * In ElasticSearch storage, the TTL triggers the index deletion directly.
                  * As all metrics data in different down sampling rule of one day are in the same index, the deletion operation
                  * is only required to run once.
+                 * 不同采样规则下的同一天的所有维度的数据在同一个 index 里，删除操作只需要执行一次
+                 * 比如 sw_metrics-count-20220920
+                 * 202209201517 分钟
+                 * 2022092015 小时
+                 * 20220920 天
                  */
                 return;
             }
