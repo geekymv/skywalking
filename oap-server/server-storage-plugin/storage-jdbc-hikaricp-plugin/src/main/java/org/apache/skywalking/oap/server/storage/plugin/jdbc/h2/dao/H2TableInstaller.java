@@ -78,7 +78,7 @@ public class H2TableInstaller extends ModelInstaller {
                 tableCreateSQL.appendLine(
                     getColumn(column) + (i != model.getColumns().size() - 1 ? "," : ""));
             }
-            tableCreateSQL.appendLine(")");
+            tableCreateSQL.appendLine(") ROW_FORMAT = DYNAMIC");
 
             if (log.isDebugEnabled()) {
                 log.debug("creating table: " + tableCreateSQL.toStringInNewLine());

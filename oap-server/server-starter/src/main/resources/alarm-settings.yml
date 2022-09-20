@@ -28,18 +28,16 @@ rules:
 #    # How many times of checks, the alarm keeps silence after alarm triggered, default as same as period.
 #    silence-period: 10
 #    message: Successful rate of endpoint {name} is lower than 75%
-  service_resp_time_rule:
-    metrics-name: service_resp_time
-    # [Optional] Default, match all services in this metrics
-    include-names:
-      - dubbox-provider
-      - dubbox-consumer
-    threshold: 1000
+  endpoint_abnormal_rule:
+    metrics-name: endpoint_abnormal
+    exclude-lables:
+      - "200"
     op: ">"
+    threshold: 10
     period: 10
-    count: 1
-    tags:
-      level: WARNING
+    count: 3
+    silence-period: 5
+    message: The request number of entity {name} non-200 status is more than expected
 #  unhealthy_event_rule:
 #    metrics-name: Unhealthy
      # Healthiness check is usually a scheduled task,
