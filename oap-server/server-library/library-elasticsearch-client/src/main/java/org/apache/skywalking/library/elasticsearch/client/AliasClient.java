@@ -38,6 +38,9 @@ public final class AliasClient {
 
     private final WebClient client;
 
+    /**
+     * 根据别名获取索引
+     */
     @SneakyThrows
     public Map<String, Index> indices(String name) {
         final CompletableFuture<Map<String, Index>> future =
