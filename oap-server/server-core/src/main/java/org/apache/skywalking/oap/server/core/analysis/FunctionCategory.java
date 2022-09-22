@@ -52,12 +52,12 @@ public enum FunctionCategory {
         if (clazz.equals(Object.class)) {
             return null;
         }
-        Annotation[] annotations = clazz.getAnnotations();
-        for (final Annotation annotation : annotations) {
-            if (annotation.annotationType().equals(annotationClass)) {
-                return annotation;
-            }
+
+        Annotation annotation = clazz.getAnnotation(annotationClass);
+        if (annotation != null) {
+            return annotation;
         }
+
         return doGetAnnotation(clazz.getSuperclass(), annotationClass);
     }
 }
