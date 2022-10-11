@@ -22,8 +22,16 @@ import java.lang.annotation.Annotation;
 import org.apache.skywalking.oap.server.core.storage.StorageException;
 
 public interface AnnotationListener {
-
+    /**
+     * listener 感兴趣的注解
+     * @return
+     */
     Class<? extends Annotation> annotation();
 
+    /**
+     * 通知 listener
+     * @param aClass 带有 listener 感兴趣的注解的类
+     * @throws StorageException
+     */
     void notify(Class aClass) throws StorageException;
 }

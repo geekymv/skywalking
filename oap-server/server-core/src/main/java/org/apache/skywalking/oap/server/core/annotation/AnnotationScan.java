@@ -29,6 +29,7 @@ import org.apache.skywalking.oap.server.core.storage.StorageException;
 
 /**
  * Scan the annotation, and notify the listener(s)
+ * 扫描类，并将带有 listener 关注的注解的类，通知给 listener
  */
 public class AnnotationScan {
 
@@ -52,17 +53,19 @@ public class AnnotationScan {
      */
     public void scan() throws IOException, StorageException {
         ClassPath classpath = ClassPath.from(this.getClass().getClassLoader());
+        // 获取到包名下的所有类（不包括匿名类）
         ImmutableSet<ClassPath.ClassInfo> classes = classpath.getTopLevelClassesRecursive("org.apache.skywalking");
         for (ClassPath.ClassInfo classInfo : classes) {
             Class<?> aClass = classInfo.load();
 
             for (AnnotationListenerCache listener : listeners) {
                 if (aClass.isAnnotationPresent(listener.annotation())) {
+                    // listener 感兴趣的类（注解）聚合在一起
                     listener.addMatch(aClass);
                 }
             }
         }
-
+        // 通知 listener
         for (AnnotationListenerCache listener : listeners) {
             listener.complete();
         }
