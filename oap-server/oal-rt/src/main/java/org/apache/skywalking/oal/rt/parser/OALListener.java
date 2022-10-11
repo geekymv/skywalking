@@ -252,10 +252,12 @@ public class OALListener extends OALParserBaseListener {
     public void enterFunctionArgCast(final OALParser.FunctionArgCastContext ctx) {
         current.getAggregationFuncStmt().getLastArgument().setCastType(ctx.getText());
     }
-
+    // endpoint_resp_time -> EndpointRespTime
     private String metricsNameFormat(String source) {
+        // 首字母转大写
         source = firstLetterUpper(source);
         int idx;
+        // 下划线转驼峰
         while ((idx = source.indexOf("_")) > -1) {
             source = source.substring(0, idx) + firstLetterUpper(source.substring(idx + 1));
         }
