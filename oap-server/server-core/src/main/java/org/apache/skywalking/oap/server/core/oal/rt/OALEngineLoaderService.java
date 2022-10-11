@@ -44,7 +44,7 @@ public class OALEngineLoaderService implements Service {
 
     /**
      * Normally it is invoked in the {@link ModuleProvider#start()} of the receiver-plugin module.
-     * 通常在 ModuleProvider#start() 方法中被调用
+     * 通常在 ModuleProvider#start() 方法中被调用，比如 JVMModuleProvider#start()
      */
     public void load(OALDefine define) throws ModuleStartException {
         if (oalDefineSet.contains(define)) {
@@ -52,18 +52,23 @@ public class OALEngineLoaderService implements Service {
             return;
         }
         try {
+            // 通过反射获取 OALRuntime
             OALEngine engine = loadOALEngine(define);
+            // 设置 StreamAnnotationListener
             StreamAnnotationListener streamAnnotationListener = new StreamAnnotationListener(moduleManager);
             engine.setStreamListener(streamAnnotationListener);
+            // 设置 DispatcherListener
             engine.setDispatcherListener(moduleManager.find(CoreModule.NAME)
                                                       .provider()
                                                       .getService(SourceReceiver.class)
                                                       .getDispatcherDetectorListener());
+            // 存储
             engine.setStorageBuilderFactory(moduleManager.find(StorageModule.NAME)
                                                          .provider()
                                                          .getService(StorageBuilderFactory.class));
-
+            // 生成类
             engine.start(OALEngineLoaderService.class.getClassLoader());
+            // 通知 listener
             engine.notifyAllListeners();
 
             oalDefineSet.add(define);
@@ -75,6 +80,8 @@ public class OALEngineLoaderService implements Service {
     /**
      * Load the OAL Engine runtime, because runtime module depends on core, so we have to use class::forname to locate
      * it.
+     * OALRuntime 定义在 oal-rt 项目里，当前代码位于 server-core，OALRuntime(oal-rt) 实现了 OALEngine(server-core) 接口
+     * oal-rt 依赖 server-core，所以需要使用反射创建 OALRuntime 实例。
      */
     private static OALEngine loadOALEngine(OALDefine define) throws ReflectiveOperationException {
         Class<?> engineRTClass = Class.forName("org.apache.skywalking.oal.rt.OALRuntime");

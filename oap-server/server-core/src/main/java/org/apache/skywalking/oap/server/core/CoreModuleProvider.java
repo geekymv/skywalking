@@ -173,7 +173,7 @@ public class CoreModuleProvider extends ModuleProvider {
         } catch (FileNotFoundException e) {
             throw new ModuleStartException(e.getMessage(), e);
         }
-
+        // 扫描 @ScopeDeclaration 注解的类
         AnnotationScan scopeScan = new AnnotationScan();
         scopeScan.registerListener(new DefaultScopeDefine.Listener());
         try {

@@ -37,6 +37,7 @@ import static java.util.Objects.isNull;
 public class DeepAnalysis {
     public AnalysisResult analysis(AnalysisResult result) {
         // 1. Set sub package name by source.metrics
+        // 聚合函数对应的类
         Class<? extends Metrics> metricsClass = MetricsHolder.find(result.getAggregationFuncStmt().getAggregationFunctionName());
         String metricsClassSimpleName = metricsClass.getSimpleName();
 

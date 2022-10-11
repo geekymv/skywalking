@@ -76,6 +76,9 @@ public class OALListener extends OALParserBaseListener {
     @Override
     public void exitVariable(OALParser.VariableContext ctx) {
         current.setVarName(ctx.getText());
+        // 设置 metrics name
+        // instance_jvm_old_gc_time = from(ServiceInstanceJVMGC.time).filter(phase == GCPhase.OLD).sum();
+        // instance_jvm_old_gc_time -> InstanceJvmOldGcTime
         current.setMetricsName(metricsNameFormat(ctx.getText()));
         current.setTableName(ctx.getText().toLowerCase());
     }

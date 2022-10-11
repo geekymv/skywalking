@@ -129,6 +129,7 @@ public class OALRuntime implements OALEngine {
         allDispatcherContext = new AllDispatcherContext();
         metricsClasses = new ArrayList<>();
         dispatcherClasses = new ArrayList<>();
+        // 启动时配置 SW_OAL_ENGINE_DEBUG=true 可以开启 debug 模式
         openEngineDebug = StringUtil.isNotEmpty(System.getenv("SW_OAL_ENGINE_DEBUG"));
     }
 
@@ -166,6 +167,7 @@ public class OALRuntime implements OALEngine {
         OALScripts oalScripts;
         try {
             ScriptParser scriptParser = ScriptParser.createFromFile(read, oalDefine.getSourcePackage());
+            // 解析 OAL 配置
             oalScripts = scriptParser.parse();
         } catch (IOException e) {
             throw new ModuleStartException("OAL script parse analysis failure.", e);
@@ -197,6 +199,7 @@ public class OALRuntime implements OALEngine {
         metricsStmts.forEach(this::buildDispatcherContext);
 
         for (AnalysisResult metricsStmt : metricsStmts) {
+            // 生成 metrics 类
             metricsClasses.add(generateMetricsClass(metricsStmt));
             generateMetricsBuilderClass(metricsStmt);
         }
@@ -214,16 +217,22 @@ public class OALRuntime implements OALEngine {
      * Generate metrics class, and inject it to classloader
      */
     private Class generateMetricsClass(AnalysisResult metricsStmt) throws OALCompileException {
+        // instance_jvm_old_gc_time = from(ServiceInstanceJVMGC.time).filter(phase == GCPhase.OLD).sum();
+        // instance_jvm_old_gc_time -> InstanceJvmOldGcTime + Metrics -> InstanceJvmOldGcTimeMetrics（要生成的类名）
         String className = metricsClassName(metricsStmt, false);
         CtClass parentMetricsClass = null;
         try {
+            // aggregationFunctionName 聚合函数对应的类
+            // sum -> SumMetrics 作为待生成类的父类 -> InstanceJvmOldGcTimeMetrics extends SumMetrics
             parentMetricsClass = classPool.get(METRICS_FUNCTION_PACKAGE + metricsStmt.getMetricsClassName());
         } catch (NotFoundException e) {
             log.error("Can't find parent class for " + className + ".", e);
             throw new OALCompileException(e.getMessage(), e);
         }
+        // 生成 Metrics 类
         CtClass metricsClass = classPool.makeClass(metricsClassName(metricsStmt, true), parentMetricsClass);
         try {
+            // 实现 WithMetadata 接口
             metricsClass.addInterface(classPool.get(WITH_METADATA_INTERFACE));
         } catch (NotFoundException e) {
             log.error("Can't find WithMetadata interface for " + className + ".", e);
@@ -231,6 +240,7 @@ public class OALRuntime implements OALEngine {
         }
 
         ClassFile metricsClassClassFile = metricsClass.getClassFile();
+        // 常量池
         ConstPool constPool = metricsClassClassFile.getConstPool();
 
         /**
@@ -487,7 +497,8 @@ public class OALRuntime implements OALEngine {
 
     private void buildDispatcherContext(AnalysisResult metricsStmt) {
         String sourceName = metricsStmt.getFrom().getSourceName();
-
+        // instance_jvm_old_gc_time = from(ServiceInstanceJVMGC.time).filter(phase == GCPhase.OLD).sum();
+        // sourceName -> ServiceInstanceJVMGC
         DispatcherContext context = allDispatcherContext.getAllContext().computeIfAbsent(sourceName, name -> {
             DispatcherContext absent = new DispatcherContext();
             absent.setSourcePackage(oalDefine.getSourcePackage());
@@ -497,11 +508,13 @@ public class OALRuntime implements OALEngine {
         });
         metricsStmt.setMetricsClassPackage(oalDefine.getDynamicMetricsClassPackage());
         metricsStmt.setSourcePackage(oalDefine.getSourcePackage());
+        // 将同一个 sourceName 的 metrics 放在一个 DispatcherContext 中
         context.getMetrics().add(metricsStmt);
     }
 
     private void prepareRTTempFolder() {
         if (openEngineDebug) {
+            // server-core-xxx.jar 所在目录
             File workPath = WorkPath.getPath();
             File folder = new File(workPath.getParentFile(), "oal-rt/");
             if (folder.exists()) {
