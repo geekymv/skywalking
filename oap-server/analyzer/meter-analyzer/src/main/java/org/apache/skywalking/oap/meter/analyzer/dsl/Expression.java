@@ -73,6 +73,7 @@ public class Expression {
      * @return The result of execution.
      */
     public Result run(final Map<String, SampleFamily> sampleFamilies) {
+        // 这个 ThreadLocal 用于在多个方法之间传递参数
         PROPERTY_REPOSITORY.set(sampleFamilies);
         try {
             SampleFamily sf = (SampleFamily) expression.run();

@@ -240,6 +240,7 @@ public class Analyzer {
                 metricType = MetricType.labeled;
             }
         }
+        // 创建 Metric
         createMetric(ctx.getScopeType(), metricType.literal, ctx.getDownsampling());
 
         if (ctx.isRetagByK8sMeta()) {

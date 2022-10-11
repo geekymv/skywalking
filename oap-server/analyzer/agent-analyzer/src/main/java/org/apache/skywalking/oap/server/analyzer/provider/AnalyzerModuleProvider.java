@@ -97,7 +97,7 @@ public class AnalyzerModuleProvider extends ModuleProvider {
 
         segmentParserService = new SegmentParserServiceImpl(getManager(), moduleConfig);
         this.registerServiceImplementation(ISegmentParserService.class, segmentParserService);
-
+        // 加载 meter config
         meterConfigs = MeterConfigs.loadConfig(
             moduleConfig.getConfigPath(), moduleConfig.meterAnalyzerActiveFileNames());
         processService = new MeterProcessService(getManager());

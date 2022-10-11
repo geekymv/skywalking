@@ -84,6 +84,7 @@ public class MeterSystem implements Service {
 
             if (functionClass.isAnnotationPresent(MeterFunction.class)) {
                 MeterFunction metricsFunction = functionClass.getAnnotation(MeterFunction.class);
+                // functionClass 是否实现 AcceptableValue 接口
                 if (!AcceptableValue.class.isAssignableFrom(functionClass)) {
                     throw new IllegalArgumentException(
                         "Function " + functionClass.getCanonicalName() + " doesn't implement AcceptableValue.");
@@ -223,6 +224,7 @@ public class MeterSystem implements Service {
          * Generate `AcceptableValue<T> createNew()` method.
          */
         try {
+            // 添加 createNew 方法，内部调用 Meter#initMeta 方法
             metricsClass.addMethod(CtNewMethod.make(
                 ""
                     + "public org.apache.skywalking.oap.server.core.analysis.meter.function.AcceptableValue createNew() {"

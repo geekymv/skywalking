@@ -181,7 +181,7 @@ public class CoreModuleProvider extends ModuleProvider {
         } catch (Exception e) {
             throw new ModuleStartException(e.getMessage(), e);
         }
-
+        // 注册 MeterSystem 服务
         this.registerServiceImplementation(MeterSystem.class, new MeterSystem(getManager()));
 
         AnnotationScan oalDisable = new AnnotationScan();
