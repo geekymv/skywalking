@@ -27,6 +27,9 @@ import lombok.SneakyThrows;
 import org.apache.skywalking.oap.server.core.analysis.metrics.Metrics;
 import org.apache.skywalking.oap.server.core.analysis.metrics.annotation.MetricsFunction;
 
+/**
+ * 存放包含 MetricsFunction 注解类
+ */
 @SuppressWarnings("UnstableApiUsage")
 public class MetricsHolder {
     private static final Map<String, Class<? extends Metrics>> REGISTER = new HashMap<>();
