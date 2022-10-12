@@ -51,8 +51,9 @@ public class JVMSourceDispatcher {
     // 发送 Metric
     public void sendMetric(String service, String serviceInstance, JVMMetric metrics) {
         // metrics.getTime() 由 agent 端设置，就是 System.currentTimeMillis();
+        // 返回的分钟格式 yyyyMMddHHmm -> 202210121731
         long minuteTimeBucket = TimeBucket.getMinuteTimeBucket(metrics.getTime());
-
+        // 生成 service id and service instance id
         final String serviceId = IDManager.ServiceID.buildId(service, true);
         final String serviceInstanceId = IDManager.ServiceInstanceID.buildId(serviceId, serviceInstance);
 
@@ -64,6 +65,7 @@ public class JVMSourceDispatcher {
             service, serviceId, serviceInstance, serviceInstanceId, minuteTimeBucket, metrics.getMemoryList());
         this.sendToMemoryPoolMetricProcess(
             service, serviceId, serviceInstance, serviceInstanceId, minuteTimeBucket, metrics.getMemoryPoolList());
+        // GC
         this.sendToGCMetricProcess(
             service, serviceId, serviceInstance, serviceInstanceId, minuteTimeBucket, metrics.getGcList());
         this.sendToThreadMetricProcess(
@@ -98,6 +100,7 @@ public class JVMSourceDispatcher {
                                        long timeBucket,
                                        List<GC> gcs) {
         gcs.forEach(gc -> {
+            // 创建 source
             ServiceInstanceJVMGC serviceInstanceJVMGC = new ServiceInstanceJVMGC();
             serviceInstanceJVMGC.setId(serviceInstanceId);
             serviceInstanceJVMGC.setName(serviceInstance);

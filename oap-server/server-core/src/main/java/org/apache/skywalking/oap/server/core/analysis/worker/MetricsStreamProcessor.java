@@ -57,6 +57,7 @@ import org.apache.skywalking.oap.server.library.module.ModuleDefineHolder;
 public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
     /**
      * Singleton instance.
+     * 单例
      */
     private final static MetricsStreamProcessor PROCESSOR = new MetricsStreamProcessor();
 

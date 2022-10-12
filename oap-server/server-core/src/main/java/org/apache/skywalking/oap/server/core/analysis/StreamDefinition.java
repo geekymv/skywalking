@@ -26,6 +26,7 @@ import org.apache.skywalking.oap.server.core.storage.type.StorageBuilder;
 @Getter
 public class StreamDefinition {
     private final String name;
+    // source scope id
     private final int scopeId;
     private final Class<? extends StorageBuilder> builder;
     private final Class<? extends StreamProcessor> processor;

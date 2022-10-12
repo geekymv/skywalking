@@ -180,6 +180,7 @@ public class OALRuntime implements OALEngine {
     public void notifyAllListeners() throws ModuleStartException {
         for (Class metricsClass : metricsClasses) {
             try {
+                // @Stream 注解，创建 metrics 的  work flow
                 streamAnnotationListener.notify(metricsClass);
             } catch (StorageException e) {
                 throw new ModuleStartException(e.getMessage(), e);
@@ -187,6 +188,7 @@ public class OALRuntime implements OALEngine {
         }
         for (Class dispatcherClass : dispatcherClasses) {
             try {
+                // dispatcher
                 dispatcherDetectorListener.addIfAsSourceDispatcher(dispatcherClass);
             } catch (Exception e) {
                 throw new ModuleStartException(e.getMessage(), e);

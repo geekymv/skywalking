@@ -90,13 +90,15 @@ public class DispatcherManager implements DispatcherDetectorListener {
                 ParameterizedType anInterface = (ParameterizedType) genericInterface;
                 if (anInterface.getRawType().getTypeName().equals(SourceDispatcher.class.getName())) {
                     // SourceDispatcher 的泛型类型
+                    // ServiceInstanceJVMGCDispatcher implements SourceDispatcher<ServiceInstanceJVMGC>
+                    // -> ServiceInstanceJVMGC
                     Type[] arguments = anInterface.getActualTypeArguments();
 
                     if (arguments.length != 1) {
                         throw new UnexpectedException("unexpected type argument number, class " + aClass.getName());
                     }
                     Type argument = arguments[0];
-
+                    // 创建 source 实例 （ServiceInstanceJVMGC）
                     Object source = ((Class) argument).newInstance();
 
                     if (!ISource.class.isAssignableFrom(source.getClass())) {
@@ -105,8 +107,9 @@ public class DispatcherManager implements DispatcherDetectorListener {
                     }
 
                     ISource dispatcherSource = (ISource) source;
+                    // 创建 dispatcher 实例 （ServiceInstanceJVMGCDispatcher）
                     SourceDispatcher dispatcher = (SourceDispatcher) aClass.newInstance();
-
+                    // source scope id
                     int scopeId = dispatcherSource.scope();
 
                     List<SourceDispatcher> dispatchers = this.dispatcherMap.get(scopeId);
