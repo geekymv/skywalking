@@ -37,7 +37,7 @@ import static java.util.Objects.isNull;
 public class DeepAnalysis {
     public AnalysisResult analysis(AnalysisResult result) {
         // 1. Set sub package name by source.metrics
-        // 聚合函数对应的类
+        // 聚合函数对应的类，比如 SumMetrics
         Class<? extends Metrics> metricsClass = MetricsHolder.find(result.getAggregationFuncStmt().getAggregationFunctionName());
         String metricsClassSimpleName = metricsClass.getSimpleName();
 
@@ -132,6 +132,7 @@ public class DeepAnalysis {
         }
 
         // 5. Get all column declared in MetricsHolder class.
+        // 递归获取有 @Column 注解的属性，作为持久化字段
         c = metricsClass;
         while (!c.equals(Object.class)) {
             for (Field field : c.getDeclaredFields()) {

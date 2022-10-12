@@ -201,6 +201,8 @@ public class OALRuntime implements OALEngine {
         for (AnalysisResult metricsStmt : metricsStmts) {
             // 生成 metrics 类
             metricsClasses.add(generateMetricsClass(metricsStmt));
+            // 生成 metrics 类对应的 builder 类（用于 entity 和 storage 之间的转换）
+            // InstanceJvmOldGcTimeMetrics -> InstanceJvmOldGcTimeMetricsBuilder
             generateMetricsBuilderClass(metricsStmt);
         }
 
@@ -356,6 +358,7 @@ public class OALRuntime implements OALEngine {
         String className = metricsBuilderClassName(metricsStmt, false);
         CtClass metricsBuilderClass = classPool.makeClass(metricsBuilderClassName(metricsStmt, true));
         try {
+            // 实现 StorageBuilder 接口
             metricsBuilderClass.addInterface(classPool.get(storageBuilderFactory.builderTemplate().getSuperClass()));
         } catch (NotFoundException e) {
             log.error("Can't find StorageBuilder interface for " + className + ".", e);
