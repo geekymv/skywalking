@@ -207,6 +207,7 @@ public class OALRuntime implements OALEngine {
         }
 
         for (Map.Entry<String, DispatcherContext> entry : allDispatcherContext.getAllContext().entrySet()) {
+            // 生成 Dispatcher 类，一个 source（有多个metrics）对应一个 dispatcher 类
             dispatcherClasses.add(generateDispatcherClass(entry.getKey(), entry.getValue()));
         }
 
@@ -412,16 +413,17 @@ public class OALRuntime implements OALEngine {
      */
     private Class generateDispatcherClass(String scopeName,
                                           DispatcherContext dispatcherContext) throws OALCompileException {
-
+        // ServiceInstanceJVMGC -> ServiceInstanceJVMGCDispatcher
         String className = dispatcherClassName(scopeName, false);
         CtClass dispatcherClass = classPool.makeClass(dispatcherClassName(scopeName, true));
         try {
             CtClass dispatcherInterface = classPool.get(DISPATCHER_INTERFACE);
-
+            // 实现 SourceDispatcher 接口
             dispatcherClass.addInterface(dispatcherInterface);
 
             /**
              * Set generic signature
+             * 设置泛型签名 SourceDispatcher<ServiceInstanceJVMGC>
              */
             String sourceClassName = oalDefine.getSourcePackage() + dispatcherContext.getSource();
             SignatureAttribute.ClassSignature dispatcherSignature =
@@ -449,6 +451,11 @@ public class OALRuntime implements OALEngine {
 
         /**
          * Generate methods
+         * 每一个 metrics 都会对应一个 do${metricsName} 方法
+         *
+         * instance_jvm_old_gc_time = from(ServiceInstanceJVMGC.time).filter(phase == GCPhase.OLD).sum();
+         * instance_jvm_old_gc_time -> doInstanceJvmOldGcTime
+         * doXxx 将 Metrics 交给 MetricsStreamProcessor 处理
          */
         for (AnalysisResult dispatcherContextMetric : dispatcherContext.getMetrics()) {
             StringWriter methodEntity = new StringWriter();
@@ -466,6 +473,7 @@ public class OALRuntime implements OALEngine {
         }
 
         try {
+            // 生成 dispatch 方法（SourceDispatcher 接口）
             StringWriter methodEntity = new StringWriter();
             configuration.getTemplate("dispatcher/dispatch.ftl").process(dispatcherContext, methodEntity);
             dispatcherClass.addMethod(CtNewMethod.make(methodEntity.toString(), dispatcherClass));

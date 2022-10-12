@@ -42,8 +42,8 @@ public abstract class OALDefine {
     /**
      * Define the booting parameters for OAL engine
      *
-     * @param configFile    OAL script file path OAL的配置文件，比如 oal/java-agent.oal
-     * @param sourcePackage the package path of source(s) used in given config OAL script file
+     * @param configFile    OAL script file path 表示 OAL 的配置文件，比如 oal/java-agent.oal
+     * @param sourcePackage the package path of source(s) used in given config OAL script file 表示 Source 类所在的包名
      * @param catalog       of metrics defined through given OAL script file. Be used as prefix of generated dispatcher
      *                      class name.
      */
