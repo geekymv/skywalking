@@ -59,6 +59,7 @@ public class DispatcherManager implements DispatcherDetectorListener {
         if (dispatchers != null) {
             source.prepare();
             for (SourceDispatcher dispatcher : dispatchers) {
+                // source (ServiceInstanceJVMGC) -> dispatcher (ServiceInstanceJVMGCDispatcher)
                 dispatcher.dispatch(source);
             }
         }

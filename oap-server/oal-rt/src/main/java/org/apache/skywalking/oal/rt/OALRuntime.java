@@ -188,7 +188,7 @@ public class OALRuntime implements OALEngine {
         }
         for (Class dispatcherClass : dispatcherClasses) {
             try {
-                // dispatcher
+                // dispatcher 放入 dispatcherMap，将 source 和 dispatcher 关联 <sourceScopeId, [dispatcher...]>
                 dispatcherDetectorListener.addIfAsSourceDispatcher(dispatcherClass);
             } catch (Exception e) {
                 throw new ModuleStartException(e.getMessage(), e);
@@ -336,7 +336,7 @@ public class OALRuntime implements OALEngine {
 
         Class targetClass;
         try {
-            // 将生成的 Metrics 类注入到类加载器
+            // 将生成的 Metrics 类注入到类加载器生成目标类
             if (SystemUtils.isJavaVersionAtMost(JavaVersion.JAVA_1_8)) {
                 targetClass = metricsClass.toClass(currentClassLoader, null);
             } else {
@@ -348,7 +348,7 @@ public class OALRuntime implements OALEngine {
         }
 
         log.debug("Generate metrics class, " + metricsClass.getName());
-        // 将 Metrics 类写入到文件，debug 模式生效
+        // 将 Metrics 类写入到文件，debug 才模式生效
         writeGeneratedFile(metricsClass, metricsClass.getSimpleName(), "metrics");
 
         return targetClass;
