@@ -174,8 +174,9 @@ public class DefaultScopeDefine {
         ID_2_NAME.put(id, name);
         NAME_2_ID.put(name, id);
 
+        // metrics 需要存储的字段
         List<ScopeDefaultColumn> scopeDefaultColumns = new ArrayList<>();
-
+        // 类上的 @ScopeDefaultColumn.VirtualColumnDefinition 注解
         ScopeDefaultColumn.VirtualColumnDefinition virtualColumn = (ScopeDefaultColumn.VirtualColumnDefinition) originalClass
             .getAnnotation(ScopeDefaultColumn.VirtualColumnDefinition.class);
         if (virtualColumn != null) {
@@ -183,15 +184,17 @@ public class DefaultScopeDefine {
                 new ScopeDefaultColumn(virtualColumn.fieldName(), virtualColumn.columnName(), virtualColumn
                     .type(), virtualColumn.isID(), virtualColumn.length()));
         }
+        // 类的属性
         Field[] scopeClassField = originalClass.getDeclaredFields();
         if (scopeClassField != null) {
             for (Field field : scopeClassField) {
+                // 属性上的 @ScopeDefaultColumn.DefinedByField 注解
                 ScopeDefaultColumn.DefinedByField definedByField = field.getAnnotation(
                     ScopeDefaultColumn.DefinedByField.class);
                 if (definedByField != null) {
                     if (!definedByField.requireDynamicActive() || ACTIVE_EXTRA_MODEL_COLUMNS) {
                         scopeDefaultColumns.add(
-                            new ScopeDefaultColumn(
+                            new ScopeDefaultColumn( // fieldName 、columnName
                                 field.getName(), definedByField.columnName(), field.getType(), false,
                                 definedByField.length()
                             ));

@@ -144,9 +144,12 @@ public class DeepAnalysis {
         }
 
         // 6. Based on Source, generate default columns
+        // 基于 Source 获取待生成 Metrics 类的属性（用于存储）
+        // instance_jvm_old_gc_time = from(ServiceInstanceJVMGC.time).filter(phase == GCPhase.OLD).sum();
+        // 基于 ServiceInstanceJVMGC 生成 InstanceJvmOldGcTimeMetrics 的属性
         List<SourceColumn> columns = SourceColumnsFactory.getColumns(result.getFrom().getSourceName());
         result.setFieldsFromSource(columns);
-
+        // 生成需要存储的属性
         result.generateSerializeFields();
 
         return result;

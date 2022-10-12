@@ -42,7 +42,7 @@ public class SourceColumn {
         this.typeName = type.getName();
         this.isID = isID;
         this.length = length;
-
+        // 属性名称 fieldName 的 getter 和 setter 方法名
         this.fieldGetter = ClassMethodUtil.toGetMethod(fieldName);
         this.fieldSetter = ClassMethodUtil.toSetMethod(fieldName);
     }

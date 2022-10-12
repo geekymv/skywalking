@@ -37,6 +37,7 @@ public class ServiceInstanceJVMGC extends Source {
         return String.valueOf(id);
     }
 
+    // requireDynamicActive = true 不作为 metrics 的属性，也就不会存储
     @Getter
     @Setter
     private String id;

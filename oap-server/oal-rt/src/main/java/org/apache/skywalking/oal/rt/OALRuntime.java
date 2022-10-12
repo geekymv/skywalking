@@ -245,6 +245,7 @@ public class OALRuntime implements OALEngine {
 
         /**
          * Create empty construct
+         * 空构造函数
          */
         try {
             CtConstructor defaultConstructor = CtNewConstructor.make("public " + className + "() {}", metricsClass);
@@ -264,9 +265,9 @@ public class OALRuntime implements OALEngine {
                 CtField newField = CtField.make(
                     "private " + field.getType()
                                       .getName() + " " + field.getFieldName() + ";", metricsClass);
-
+                // 添加属性
                 metricsClass.addField(newField);
-
+                // 为属性添加 getter setter 方法
                 metricsClass.addMethod(CtNewMethod.getter(field.getFieldGetter(), newField));
                 metricsClass.addMethod(CtNewMethod.setter(field.getFieldSetter(), newField));
 
