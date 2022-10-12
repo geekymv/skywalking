@@ -18,6 +18,7 @@
 
 package org.apache.skywalking.oap.server.core.analysis;
 
+import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,6 +48,19 @@ public class IDManagerTest {
         final IDManager.ServiceID.ServiceRelationDefine serviceRelationDefine = IDManager.ServiceID.analysisRelationId(
             relationId);
         Assert.assertEquals(define, serviceRelationDefine);
+    }
+
+    @Test
+    public void testServiceIdAndServiceInstanceId() {
+        // service id
+        String service = "spring-app";
+        final String serviceId = IDManager.ServiceID.buildId(service, true);
+        System.out.println(serviceId);
+
+        // service instance id
+        String instanceName = UUID.randomUUID().toString().replace("-", "") + "@192.168.10.1";
+        final String serviceInstanceId = IDManager.ServiceInstanceID.buildId(serviceId, instanceName);
+        System.out.println(serviceInstanceId);
     }
 
 }
