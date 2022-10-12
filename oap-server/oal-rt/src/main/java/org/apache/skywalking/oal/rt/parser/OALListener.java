@@ -80,6 +80,7 @@ public class OALListener extends OALParserBaseListener {
         // instance_jvm_old_gc_time = from(ServiceInstanceJVMGC.time).filter(phase == GCPhase.OLD).sum();
         // instance_jvm_old_gc_time -> InstanceJvmOldGcTime
         current.setMetricsName(metricsNameFormat(ctx.getText()));
+        // table name
         current.setTableName(ctx.getText().toLowerCase());
     }
 

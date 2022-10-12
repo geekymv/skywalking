@@ -287,7 +287,7 @@ public class OALRuntime implements OALEngine {
                     banyanShardingKeyAnnotation.addMemberValue("index", new IntegerMemberValue(constPool, 0));
                 }
                 annotationsAttribute.addAnnotation(columnAnnotation);
-
+                // 给属性添加 @Column 注解
                 newField.getFieldInfo().addAttribute(annotationsAttribute);
             } catch (CannotCompileException e) {
                 log.error(
@@ -298,6 +298,7 @@ public class OALRuntime implements OALEngine {
 
         /**
          * Generate methods
+         * 根据 freemarker 模版 生成方法
          */
         for (String method : METRICS_CLASS_METHODS) {
             StringWriter methodEntity = new StringWriter();
@@ -312,7 +313,7 @@ public class OALRuntime implements OALEngine {
 
         /**
          * Add following annotation to the metrics class
-         *
+         * 给 Metrics 类添加 @Stream 注解
          * at Stream(name = "${tableName}", scopeId = ${sourceScopeId}, builder = ${metricsName}Metrics.Builder.class, processor = MetricsStreamProcessor.class)
          */
         AnnotationsAttribute annotationsAttribute = new AnnotationsAttribute(
@@ -330,6 +331,7 @@ public class OALRuntime implements OALEngine {
 
         Class targetClass;
         try {
+            // 将生成的 Metrics 类注入到类加载器
             if (SystemUtils.isJavaVersionAtMost(JavaVersion.JAVA_1_8)) {
                 targetClass = metricsClass.toClass(currentClassLoader, null);
             } else {
@@ -341,6 +343,7 @@ public class OALRuntime implements OALEngine {
         }
 
         log.debug("Generate metrics class, " + metricsClass.getName());
+        // 将 Metrics 类写入到文件，debug 模式生效
         writeGeneratedFile(metricsClass, metricsClass.getSimpleName(), "metrics");
 
         return targetClass;
