@@ -26,6 +26,10 @@ spring:
           uri: lb://oap-service
           predicates:
             - Path=/graphql/**
+        - id: user-route
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
     discovery:
       client:
         simple:
@@ -34,6 +38,8 @@ spring:
               - uri: http://127.0.0.1:12800
             # - uri: http://<oap-host-1>:<oap-port1>
             # - uri: http://<oap-host-2>:<oap-port2>
+            user-service:
+              - uri: http://127.0.0.1:9090
 
   mvc:
     throw-exception-if-no-handler-found: true
