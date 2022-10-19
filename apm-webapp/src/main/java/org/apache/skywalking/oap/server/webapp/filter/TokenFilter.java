@@ -77,10 +77,14 @@ public class TokenFilter implements GlobalFilter, Ordered {
 
     private String getRequestToken(ServerHttpRequest req) {
         List<String> tokens = req.getHeaders().get(TOKEN);
-        if (CollectionUtils.isEmpty(tokens)) {
-            return "";
+        String token = "";
+        if (!CollectionUtils.isEmpty(tokens)) {
+            token = tokens.get(0);
         }
-        return tokens.get(0);
+        if (!StringUtils.hasLength(token)) {
+            token = req.getQueryParams().getFirst(TOKEN);
+        }
+        return token;
     }
 
     private Mono<Void> sendResponseJson(ServerHttpResponse response, Result res) {
