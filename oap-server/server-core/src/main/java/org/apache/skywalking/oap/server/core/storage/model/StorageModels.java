@@ -77,7 +77,11 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         this.followColumnNameRules(model);
         models.add(model);
 
-        // 添加 model 的时候可能还没有 listeners，见下面的 addModelListener 方法
+        /**
+         * 添加 model 的时候可能还没有 listeners，见下面的 addModelListener 方法
+         * addModelListener 方法目前只在存储模块启动的时候调用，比如 StorageModuleElasticsearchProvider#start()
+         * 也就是说在存储模块之后启动的服务才有会 listeners，这样就可以保证所有的 model 都会调用 listener
+         */
         for (final CreatingListener listener : listeners) {
             // 创建表结构（对于 MySQL），ES索引
             listener.whenCreating(model);
