@@ -43,6 +43,7 @@ public enum FunctionCategory {
         }
         annotation = doGetAnnotation(aClass, MetricsFunction.class);
         if (annotation != null) {
+            // InstanceJvmOldGcTimeMetrics -> metrics-sum
             return (METRICS.getName() + Const.LINE + ((MetricsFunction) annotation).functionName()).toLowerCase();
         }
         return "";

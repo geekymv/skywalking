@@ -78,6 +78,7 @@ public class StorageEsInstaller extends ModelInstaller {
             }
             return exist;
         }
+        // es 索引模版
         boolean templateExists = esClient.isExistsTemplate(tableName);
         final Optional<IndexTemplate> template = esClient.getTemplate(tableName);
         boolean lastIndexExists = esClient.isExistsIndex(TimeSeriesUtils.latestWriteIndexName(model));
@@ -93,6 +94,7 @@ public class StorageEsInstaller extends ModelInstaller {
             structures.putStructure(
                 tableName, template.get().getMappings()
             );
+            // 创建 mapping
             exist = structures.containsStructure(tableName, createMapping(model));
         }
         return exist;
@@ -109,6 +111,7 @@ public class StorageEsInstaller extends ModelInstaller {
 
     private void createNormalTable(Model model) throws StorageException {
         ElasticSearchClient esClient = (ElasticSearchClient) client;
+        // InstanceJvmOldGcTimeMetrics -> metrics-sum
         String tableName = IndexController.INSTANCE.getTableName(model);
         Mappings mapping = createMapping(model);
         if (!esClient.isExistsIndex(tableName)) {
@@ -139,8 +142,11 @@ public class StorageEsInstaller extends ModelInstaller {
     private void createTimeSeriesTable(Model model) throws StorageException {
         ElasticSearchClient esClient = (ElasticSearchClient) client;
         String tableName = IndexController.INSTANCE.getTableName(model);
+        // 创建 setting
         Map<String, Object> settings = createSetting(model);
+        // 创建 mapping
         Mappings mapping = createMapping(model);
+        // 最新的索引名称 alarm_record-20221101
         String indexName = TimeSeriesUtils.latestWriteIndexName(model);
         try {
             boolean shouldUpdateTemplate = !esClient.isExistsTemplate(tableName);
@@ -170,6 +176,7 @@ public class StorageEsInstaller extends ModelInstaller {
                     }
                 }
             } else {
+                // 创建索引
                 boolean isAcknowledged = esClient.createIndex(indexName);
                 log.info("create {} index finished, isAcknowledged: {}", indexName, isAcknowledged);
                 if (!isAcknowledged) {

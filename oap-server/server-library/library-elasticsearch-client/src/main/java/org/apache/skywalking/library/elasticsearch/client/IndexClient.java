@@ -33,6 +33,9 @@ import org.apache.skywalking.library.elasticsearch.ElasticSearchVersion;
 import org.apache.skywalking.library.elasticsearch.response.Index;
 import org.apache.skywalking.library.elasticsearch.response.Mappings;
 
+/**
+ * 索引 index
+ */
 @Slf4j
 @RequiredArgsConstructor
 public final class IndexClient {

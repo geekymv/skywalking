@@ -73,7 +73,7 @@ public class ElasticSearchClient implements Client, HealthCheckable {
 
     @Setter
     private volatile String password;
-
+    // 索引名称转换器，添加 namespace 前缀
     private final Function<String, String> indexNameConverter;
 
     private final DelegatedHealthChecker healthChecker = new DelegatedHealthChecker();

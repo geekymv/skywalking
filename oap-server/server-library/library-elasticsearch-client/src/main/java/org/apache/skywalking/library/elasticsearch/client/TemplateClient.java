@@ -33,6 +33,10 @@ import org.apache.skywalking.library.elasticsearch.response.IndexTemplate;
 import org.apache.skywalking.library.elasticsearch.response.IndexTemplates;
 import org.apache.skywalking.library.elasticsearch.response.Mappings;
 
+/**
+ * 索引模版
+ * https://www.elastic.co/guide/en/elasticsearch/reference/7.17/index-templates.html
+ */
 @Slf4j
 @RequiredArgsConstructor
 public final class TemplateClient {

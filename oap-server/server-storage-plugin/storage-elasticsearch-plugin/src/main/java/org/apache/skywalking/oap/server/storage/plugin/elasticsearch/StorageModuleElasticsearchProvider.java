@@ -120,9 +120,11 @@ public class StorageModuleElasticsearchProvider extends ModuleProvider {
 
     @Override
     public void prepare() throws ServiceNotProvidedException {
+        // 注册 StorageBuilderFactory
         this.registerServiceImplementation(StorageBuilderFactory.class, new StorageBuilderFactory.Default());
 
         if (StringUtil.isEmpty(config.getNamespace())) {
+            // 默认 namespace 为 sw
             config.setNamespace("sw");
         } else {
             config.setNamespace(config.getNamespace().toLowerCase());
@@ -163,7 +165,7 @@ public class StorageModuleElasticsearchProvider extends ModuleProvider {
              */
             monitor.start();
         }
-
+        // 创建 es client
         elasticSearchClient = new ElasticSearchClient(
             config.getClusterNodes(), config.getProtocol(), config.getTrustStorePath(), config
             .getTrustStorePass(), config.getUser(), config.getPassword(),
@@ -176,6 +178,7 @@ public class StorageModuleElasticsearchProvider extends ModuleProvider {
             new BatchProcessEsDAO(elasticSearchClient, config.getBulkActions(), config
                 .getFlushInterval(), config.getConcurrentRequests())
         );
+        // 注册 StorageDAO
         this.registerServiceImplementation(StorageDAO.class, new StorageEsDAO(elasticSearchClient));
         this.registerServiceImplementation(
             IHistoryDeleteDAO.class, new HistoryDeleteEsDAO(elasticSearchClient));

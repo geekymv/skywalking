@@ -136,7 +136,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         final StorageBuilderFactory storageBuilderFactory = moduleDefineHolder.find(StorageModule.NAME)
                                                                               .provider()
                                                                               .getService(StorageBuilderFactory.class);
-        // 获取 Metric 的存储构造（数据格式的转换），比如 InstanceJvmCpuMetrics 对应存储 InstanceJvmCpuMetricsBuilder
+        // 获取 Metric 的存储构造（数据格式的转换），比如 InstanceJvmOldGcTimeMetrics 对应存储 InstanceJvmOldGcTimeMetricsBuilder
         final Class<? extends StorageBuilder> builder = storageBuilderFactory.builderOf(
             metricsClass, stream.getBuilder());
 
@@ -175,6 +175,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         if (supportDownSampling) {
             // Hour
             if (configService.shouldToHour()) {
+                // 添加 model
                 Model model = modelSetter.add(
                     metricsClass, stream.getScopeId(), new Storage(stream.getName(), timeRelativeID, DownSampling.Hour),
                     false

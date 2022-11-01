@@ -50,7 +50,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         this.columnNameOverrideRule = new HashMap<>();
         this.listeners = new ArrayList<>();
     }
-
+    // aClass -> metricsClass
     @Override
     public Model add(Class<?> aClass, int scopeId, Storage storage, boolean record) throws StorageException {
         // Check this scope id is valid.
@@ -77,8 +77,9 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         this.followColumnNameRules(model);
         models.add(model);
 
+        // 添加 model 的时候可能还没有 listeners，见下面的 addModelListener 方法
         for (final CreatingListener listener : listeners) {
-            // 创建表结构（对于 MySQL）
+            // 创建表结构（对于 MySQL），ES索引
             listener.whenCreating(model);
         }
         return model;
@@ -96,6 +97,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
     public void addModelListener(final CreatingListener listener) throws StorageException {
         listeners.add(listener);
         for (Model model : models) {
+            // 使用当前 listener 执行所有的 model 创建
             listener.whenCreating(model);
         }
     }
