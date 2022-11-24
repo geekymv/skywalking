@@ -144,11 +144,12 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         StorageDAO storageDAO = moduleDefineHolder.find(StorageModule.NAME).provider().getService(StorageDAO.class);
         IMetricsDAO metricsDAO;
         try {
+            // 每个 Metrics 都会创建一个 IMetricsDAO 实例
             metricsDAO = storageDAO.newMetricsDao(builder.getDeclaredConstructor().newInstance());
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new UnexpectedException("Create " + stream.getBuilder().getSimpleName() + " metrics DAO failure.", e);
         }
-
+        // ModelCreator
         ModelCreator modelSetter = moduleDefineHolder.find(CoreModule.NAME).provider().getService(ModelCreator.class);
         // 获取采样配置
         DownSamplingConfigService configService = moduleDefineHolder.find(CoreModule.NAME)
@@ -175,8 +176,8 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
         if (supportDownSampling) {
             // Hour
             if (configService.shouldToHour()) {
-                // 添加 model
-                Model model = modelSetter.add(
+                // 添加 model（创建表结构）
+                Model model = modelSetter.add( // stream 注解
                     metricsClass, stream.getScopeId(), new Storage(stream.getName(), timeRelativeID, DownSampling.Hour),
                     false
                 );

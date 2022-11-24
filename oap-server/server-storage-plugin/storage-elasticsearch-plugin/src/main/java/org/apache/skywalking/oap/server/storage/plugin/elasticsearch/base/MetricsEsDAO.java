@@ -47,6 +47,7 @@ public class MetricsEsDAO extends EsDAO implements IMetricsDAO {
     protected MetricsEsDAO(ElasticSearchClient client,
                            StorageBuilder<Metrics> storageBuilder) {
         super(client);
+        // StorageBuilder metrics实体-存储结构的转换，比如 InstanceJvmOldGcTimeMetricsBuilder
         this.storageBuilder = storageBuilder;
     }
 

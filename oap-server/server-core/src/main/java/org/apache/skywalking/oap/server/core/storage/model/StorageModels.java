@@ -59,17 +59,18 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         List<ModelColumn> modelColumns = new ArrayList<>();
         ShardingKeyChecker checker = new ShardingKeyChecker();
         SQLDatabaseModelExtension sqlDBModelExtension = new SQLDatabaseModelExtension();
+        // 根据 metricsClass 构造 modelColumns
         retrieval(aClass, storage.getModelName(), modelColumns, scopeId, checker, sqlDBModelExtension, record);
         checker.check(storage.getModelName());
         // 创建 model
         Model model = new Model(
             storage.getModelName(), // 表名
-            modelColumns, // 列名
+            modelColumns, // 所有的列名
             scopeId,
             storage.getDownsampling(),
-            record,
+            record, // false
             isSuperDatasetModel(aClass),
-            FunctionCategory.uniqueFunctionName(aClass),
+            FunctionCategory.uniqueFunctionName(aClass), // metrics 聚合名称（InstanceJvmOldGcTimeMetrics -> metrics-sum）
             storage.isTimeRelativeID(),
             sqlDBModelExtension
         );
@@ -83,7 +84,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
          * 也就是说在存储模块之后启动的服务才有会 listeners，这样就可以保证所有的 model 都会调用 listener
          */
         for (final CreatingListener listener : listeners) {
-            // 创建表结构（对于 MySQL），ES索引
+            // 根据 Model 创建表结构（对于 MySQL），ES索引
             listener.whenCreating(model);
         }
         return model;
@@ -119,7 +120,7 @@ public class StorageModels implements IModelManager, ModelCreator, ModelManipula
         if (log.isDebugEnabled()) {
             log.debug("Analysis {} to generate Model.", clazz.getName());
         }
-
+        // metrics 类的属性
         Field[] fields = clazz.getDeclaredFields();
 
         for (Field field : fields) {

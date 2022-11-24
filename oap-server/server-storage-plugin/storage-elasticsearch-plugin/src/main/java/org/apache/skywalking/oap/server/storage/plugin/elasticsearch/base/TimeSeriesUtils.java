@@ -50,6 +50,7 @@ public class TimeSeriesUtils {
      */
     public static String latestWriteIndexName(Model model) {
         String tableName = IndexController.INSTANCE.getTableName(model);
+        // 天维度 20221124
         long dayTimeBucket = TimeBucket.getTimeBucket(System.currentTimeMillis(), DownSampling.Day);
         if (model.isRecord() && model.isSuperDataset()) {
             return tableName + Const.LINE + compressTimeBucket(dayTimeBucket, SUPER_DATASET_DAY_STEP);

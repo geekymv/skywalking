@@ -66,6 +66,7 @@ public class StorageEsInstaller extends ModelInstaller {
     protected boolean isExists(Model model) {
         ElasticSearchClient esClient = (ElasticSearchClient) client;
         String tableName = IndexController.INSTANCE.getTableName(model);
+        // 逻辑表和物理表的映射（metrics 指标会聚合）
         IndexController.LogicIndicesRegister.registerRelation(model.getName(), tableName);
         if (!model.isTimeSeries()) {
             boolean exist = esClient.isExistsIndex(tableName);
@@ -78,9 +79,10 @@ public class StorageEsInstaller extends ModelInstaller {
             }
             return exist;
         }
-        // es 索引模版
+        // es 索引模版是否存在
         boolean templateExists = esClient.isExistsTemplate(tableName);
         final Optional<IndexTemplate> template = esClient.getTemplate(tableName);
+        // 最新的索引是否存在（metrics-sum-20221124）
         boolean lastIndexExists = esClient.isExistsIndex(TimeSeriesUtils.latestWriteIndexName(model));
 
         if ((templateExists && !template.isPresent()) || (!templateExists && template.isPresent())) {

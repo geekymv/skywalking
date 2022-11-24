@@ -232,6 +232,7 @@ public class StorageModuleElasticsearchProvider extends ModuleProvider {
         elasticSearchClient.registerChecker(healthChecker);
         try {
             elasticSearchClient.connect();
+            // 创建 ModelInstaller
             StorageEsInstaller installer = new StorageEsInstaller(elasticSearchClient, getManager(), config);
 
             getManager().find(CoreModule.NAME).provider().getService(ModelCreator.class).addModelListener(installer);
