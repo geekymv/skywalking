@@ -113,10 +113,13 @@ public class MetricsEsDAO extends EsDAO implements IMetricsDAO {
     @Override
     public UpdateRequest prepareBatchUpdate(Model model, Metrics metrics) {
         final HashMapConverter.ToStorage toStorage = new HashMapConverter.ToStorage();
+        // InstanceJvmOldGcCountMetricsBuilder, 把 metrics entity 中的值放入 map 中
         storageBuilder.entity2Storage(metrics, toStorage);
+        // 返回所有的 columns
         Map<String, Object> builder =
             IndexController.INSTANCE.appendMetricTableColumn(model, toStorage.obtain());
         String modelName = TimeSeriesUtils.writeIndexName(model, metrics.getTimeBucket());
+        // 生成 docId
         String id = IndexController.INSTANCE.generateDocId(model, metrics.id());
         return getClient().prepareUpdate(modelName, id, builder);
     }

@@ -39,7 +39,7 @@ MetricsAggregateWorker（L1聚合） -> MetricsRemoteWorker（将 metrics 发送
   
 PersistentConsumer 消费 DataCarrier -> 将数据写入 ReadWriteSafeCache
 
-PersistenceTimer 数据持久化定时器
+PersistenceTimer 数据持久化定时器，每25秒执行一次，将缓存中的数据取出来持久化
 
 #### 告警
 MetricsPersistentWorker#nextWorker 触发告警 AlarmNotifyWorker -> AlarmEntrance -> MetricsNotify(NotifyHandler)#notify 方法，将 Metrics 放入对应规则的滑动窗口

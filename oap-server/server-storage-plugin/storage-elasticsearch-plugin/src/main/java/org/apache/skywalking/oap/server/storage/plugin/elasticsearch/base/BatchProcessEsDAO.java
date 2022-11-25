@@ -73,8 +73,10 @@ public class BatchProcessEsDAO extends EsDAO implements IBatchDAO {
         if (CollectionUtils.isNotEmpty(prepareRequests)) {
             return CompletableFuture.allOf(prepareRequests.stream().map(prepareRequest -> {
                 if (prepareRequest instanceof InsertRequest) {
+                    // insert
                     return bulkProcessor.add(((IndexRequestWrapper) prepareRequest).getRequest());
                 } else {
+                    // update
                     return bulkProcessor.add(((UpdateRequestWrapper) prepareRequest).getRequest());
                 }
             }).toArray(CompletableFuture[]::new));

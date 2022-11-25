@@ -89,6 +89,7 @@ public final class BulkProcessor {
     private CompletableFuture<Void> internalAdd(Object request) {
         requireNonNull(request, "request");
         final CompletableFuture<Void> f = new CompletableFuture<>();
+        // 将请求放入队列中
         requests.put(new Holder(f, request));
         flushIfNeeded();
         return f;
@@ -114,6 +115,7 @@ public final class BulkProcessor {
         }
 
         final List<Holder> batch = new ArrayList<>(requests.size());
+        // 将队列中的数据放入batch
         requests.drainTo(batch);
 
         final CompletableFuture<Void> flush = doFlush(batch);
@@ -136,6 +138,7 @@ public final class BulkProcessor {
                     bs.add(v.codec().encode(holder.request));
                     bs.add("\n".getBytes());
                 }
+                // 批处理内容
                 final ByteBuf content = Unpooled.wrappedBuffer(bs.toArray(new byte[0][]));
                 return es.get().client().execute(rf.bulk().bulk(content))
                          .aggregate().thenAccept(response -> {

@@ -82,6 +82,7 @@ public class ReadWriteSafeCache<T> {
         lock.lock();
         try {
             // Switch the read and write pointers, when there is no writing.
+            // 交换读写缓存
             BufferedData<T> tempPointer = writeBufferPointer;
             writeBufferPointer = readBufferPointer;
             readBufferPointer = tempPointer;
@@ -89,6 +90,7 @@ public class ReadWriteSafeCache<T> {
             lock.unlock();
         }
         // Call read method outside of write lock for concurrency read-write.
+        // 读取缓存中的所有 metrics
         return readBufferPointer.read();
     }
 }

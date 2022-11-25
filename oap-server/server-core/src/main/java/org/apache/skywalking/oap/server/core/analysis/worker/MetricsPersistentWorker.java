@@ -94,6 +94,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
                             AbstractWorker<Metrics> nextAlarmWorker, AbstractWorker<ExportEvent> nextExportWorker,
                             MetricsTransWorker transWorker, boolean enableDatabaseSession, boolean supportUpdate,
                             long storageSessionTimeout, int metricsDataTTL) {
+        // 指定 ReadWriteSafeCache
         super(moduleDefineHolder, new ReadWriteSafeCache<>(new MergableBufferedData(), new MergableBufferedData()));
         this.model = model;
         this.context = new HashMap<>(100);
@@ -101,7 +102,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
         this.metricsDAO = metricsDAO;
         this.nextAlarmWorker = Optional.ofNullable(nextAlarmWorker);
         this.nextExportWorker = Optional.ofNullable(nextExportWorker);
-        this.transWorker = Optional.ofNullable(transWorker);
+        this.transWorker = Optional.ofNullable(transWorker); // 分钟维度转换成小时、天的维度
         this.supportUpdate = supportUpdate;
         this.sessionTimeout = storageSessionTimeout;
         this.persistentCounter = 0;
@@ -142,6 +143,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
 
     /**
      * Create the leaf and down-sampling MetricsPersistentWorker, no next step.
+     * 创建 MetricsPersistentWorker，没有 next worker
      */
     MetricsPersistentWorker(ModuleDefineHolder moduleDefineHolder,
                             Model model,
@@ -158,6 +160,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
         // Skipping default value mechanism only works for minute dimensionality.
         // Metrics in hour and day dimensionalities would not apply this as duration is too long,
         // applying this could make precision of hour/day metrics to be lost easily.
+        // 分钟维度的 worker 忽略默认值的 metrics
         this.skipDefaultValueMetric = false;
 
         // For a down-sampling metrics, we prolong the session timeout for 4 times, nearly 5 minutes.
@@ -199,16 +202,18 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
         List<PrepareRequest> prepareRequests = new ArrayList<>(lastCollection.size());
         for (Metrics data : lastCollection) {
             // hourPersistenceWorker、dayPersistenceWorker
+            // 将 metrics 转换成 小时、天维度的数据
             transWorker.ifPresent(metricsTransWorker -> metricsTransWorker.in(data));
 
             metricsList.add(data);
 
             if (metricsList.size() == batchSize) {
-                // 将 Metrics 数据写入存储
+                // 将 Metrics 数据写入存储 request，metricsList 会清空
                 flushDataToStorage(metricsList, prepareRequests);
             }
         }
 
+        // 不足一个 batchSize 的 metrics
         if (metricsList.size() > 0) {
             flushDataToStorage(metricsList, prepareRequests);
         }
@@ -225,11 +230,13 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
     private void flushDataToStorage(List<Metrics> metricsList,
                                     List<PrepareRequest> prepareRequests) {
         try {
+            // 从DB中加载 metrics 放入缓存
             loadFromStorage(metricsList);
 
             long timestamp = System.currentTimeMillis();
             for (Metrics metrics : metricsList) {
                 Metrics cachedMetrics = context.get(metrics);
+                // 缓存中有（上面刚刚从DB加载到缓存），说明DB中存在metrics,需要更新
                 if (cachedMetrics != null) {
                     /*
                      * If the metrics is not supportUpdate, defined through MetricsExtension#supportUpdate,
@@ -241,15 +248,18 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
                     /*
                      * Merge metrics into cachedMetrics, change only happens inside cachedMetrics.
                      */
+                    // 和缓存中的 metrics 合并
                     final boolean isAbandoned = !cachedMetrics.combine(metrics);
                     if (isAbandoned) {
                         continue;
                     }
+                    // 计算 metrics value
                     cachedMetrics.calculate();
                     if (skipDefaultValueMetric && cachedMetrics.haveDefault() && cachedMetrics.isDefaultValue()) {
                         // Skip metrics in default value
                         skippedMetricsCounter.inc();
                     } else {
+                        // 准备批量更新的 request
                         prepareRequests.add(metricsDAO.prepareBatchUpdate(model, cachedMetrics));
                     }
                     nextWorker(cachedMetrics);
@@ -295,9 +305,11 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
     private void loadFromStorage(List<Metrics> metrics) {
         final long currentTimeMillis = System.currentTimeMillis();
         try {
+            // 不在缓存中的 metrics
             List<Metrics> notInCacheMetrics =
                 metrics.stream()
                        .filter(m -> {
+                           // 判断 context 中是否有 metrics
                            final Metrics cachedValue = context.get(m);
                            // Not cached or session disabled, the metric could be tagged `not in cache`.
                            if (cachedValue == null || !enableDatabaseSession) {
@@ -305,7 +317,7 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
                            }
                            // The metric is in the cache, but still we have to check
                            // whether the cache is expired due to TTL.
-                           // This is a cache-DB inconsistent case:
+                           // This is a cache-DB inconsistent case: 缓存和DB一致性
                            // Metrics keep coming due to traffic, but the entity in the
                            // database has been removed due to TTL.
                            if (!model.isTimeRelativeID() && supportUpdate) {
@@ -324,12 +336,13 @@ public class MetricsPersistentWorker extends PersistenceWorker<Metrics> {
             if (notInCacheMetrics.isEmpty()) {
                 return;
             }
-
+            // 从DB中获取这些不在缓存中的metrics
             final List<Metrics> dbMetrics = metricsDAO.multiGet(model, notInCacheMetrics);
             if (!enableDatabaseSession) {
                 // Clear the cache only after results from DB are returned successfully.
                 context.clear();
             }
+            // 将这些 metrics 放入缓存中
             dbMetrics.forEach(m -> context.put(m, m));
         } catch (final Exception e) {
             log.error("Failed to load metrics for merging", e);

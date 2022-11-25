@@ -68,6 +68,7 @@ public class MetricsStreamProcessor implements StreamProcessor<Metrics> {
 
     /**
      * Worker table hosts all persistent workers.
+     * 负责存储的 workers
      */
     @Getter
     private List<MetricsPersistentWorker> persistentWorkers = new ArrayList<>();

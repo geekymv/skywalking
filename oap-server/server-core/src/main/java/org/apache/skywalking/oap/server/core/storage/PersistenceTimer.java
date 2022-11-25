@@ -107,6 +107,7 @@ public enum PersistenceTimer {
         HistogramMetrics.Timer allTimer = allLatency.createTimer();
         List<PersistenceWorker<? extends StorageData>> workers = new ArrayList<>();
         workers.addAll(TopNStreamProcessor.getInstance().getPersistentWorkers());
+        // metrics 的持久化 workers
         workers.addAll(MetricsStreamProcessor.getInstance().getPersistentWorkers());
 
         final CompletableFuture<Void> future =
@@ -122,7 +123,7 @@ public enum PersistenceTimer {
                                 worker.getClass().getName()
                             );
                         }
-                        // 批量获取 TopN、 Metric 数据
+                        // 构造 TopN、 Metric 数据 request
                         innerPrepareRequests = worker.buildBatchRequests();
 
                         worker.endOfRound();
@@ -135,6 +136,7 @@ public enum PersistenceTimer {
                     // Execution stage
                     // 执行阶段
                     HistogramMetrics.Timer executeLatencyTimer = executeLatency.createTimer();
+                    // 批处理
                     batchDAO.flush(innerPrepareRequests)
                             .whenComplete(($1, $2) -> executeLatencyTimer.close());
                 }, prepareExecutorService);

@@ -72,6 +72,7 @@ public enum IndexController {
         if (!isMetricModel(model)) {
             return columns;
         }
+        // 对于 metrics, 给 model 添加一个 column
         columns.put(LogicIndicesRegister.METRIC_TABLE_NAME, model.getName());
         return columns;
     }

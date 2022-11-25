@@ -173,6 +173,7 @@ public class StorageModuleElasticsearchProvider extends ModuleProvider {
             config.getSocketTimeout(), config.getResponseTimeout(),
             config.getNumHttpClientThread()
         );
+        // 注册批处理DAO
         this.registerServiceImplementation(
             IBatchDAO.class,
             new BatchProcessEsDAO(elasticSearchClient, config.getBulkActions(), config

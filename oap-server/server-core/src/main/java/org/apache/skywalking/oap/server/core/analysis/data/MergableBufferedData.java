@@ -51,6 +51,7 @@ public class MergableBufferedData<METRICS extends Metrics> implements BufferedDa
         if (existed == null) {
             buffer.put(id, data);
         } else {
+            // combine 合并id相同的 metrics，比如 SumMetrics 是值的累加
             final boolean isAbandoned = !existed.combine(data);
             if (isAbandoned) {
                 buffer.remove(id);
