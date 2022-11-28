@@ -129,10 +129,13 @@ public class SharingServerModuleProvider extends ModuleProvider {
             }
             this.registerServiceImplementation(GRPCHandlerRegister.class, grpcHandlerRegister);
         } else {
+            // ReceiverGRPCHandlerRegister 内部维护 GRPCHandlerRegister，实际上是对 GRPCHandlerRegister 的委托
             this.receiverGRPCHandlerRegister = new ReceiverGRPCHandlerRegister();
             if (Objects.nonNull(authenticationInterceptor)) {
+                // 添加 token 认证拦截器
                 receiverGRPCHandlerRegister.addFilter(authenticationInterceptor);
             }
+            // 注册 GRPCHandlerRegister
             this.registerServiceImplementation(GRPCHandlerRegister.class, receiverGRPCHandlerRegister);
         }
     }
@@ -144,6 +147,7 @@ public class SharingServerModuleProvider extends ModuleProvider {
         }
 
         if (Objects.nonNull(receiverGRPCHandlerRegister)) {
+            // 设置 GRPCHandlerRegister 的实现（从 core 中获取 GRPCHandlerRegister 的实现 GRPCHandlerRegisterImpl ）
             receiverGRPCHandlerRegister.setGrpcHandlerRegister(getManager().find(CoreModule.NAME)
                                                                            .provider()
                                                                            .getService(GRPCHandlerRegister.class));

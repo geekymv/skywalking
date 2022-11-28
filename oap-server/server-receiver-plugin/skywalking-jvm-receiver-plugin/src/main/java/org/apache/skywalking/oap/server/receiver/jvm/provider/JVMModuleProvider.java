@@ -58,7 +58,7 @@ public class JVMModuleProvider extends ModuleProvider {
                     .provider()
                     .getService(OALEngineLoaderService.class)
                     .load(JVMOALDefine.INSTANCE); // 加载 JVM OAL 定义
-
+        // 获取 GRPCHandlerRegister
         GRPCHandlerRegister grpcHandlerRegister = getManager().find(SharingServerModule.NAME)
                                                               .provider()
                                                               .getService(GRPCHandlerRegister.class);

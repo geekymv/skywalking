@@ -25,6 +25,7 @@ import org.apache.skywalking.oap.server.library.module.ModuleDefine;
 /**
  * Sharing server is an independent gRPC and REST servers provided for all receiver modules. In default, this module
  * would not be activated unless the user active explicitly. It only delegates the core gRPC and REST servers.
+ * 默认情况下，Sharing server 不会启用，它只是 core gRPC 和 REST server 的委托
  *
  * Once it is activated, provides separated servers, then all receivers use these to accept outside requests. Typical,
  * this is activated to avoid the ip, port and thread pool sharing between receiver and internal traffics. For security

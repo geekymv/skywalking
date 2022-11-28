@@ -50,7 +50,7 @@ public abstract class ModuleDefine implements ModuleProviderHolder {
 
     /**
      * @return the {@link Service} provided by this module.
-     * 定义 provider 需要实现的 Service 接口
+     * 定义 provider 需要实现的 Service 接口，对外提供的服务
      */
     public abstract Class[] services();
 
