@@ -50,7 +50,7 @@ public class GRPCServer implements Server {
     private String privateKeyFile;
     private String trustedCAsFile;
     private DynamicSslContext sslContext;
-    private int threadPoolSize = Runtime.getRuntime().availableProcessors() * 4;
+    private int threadPoolSize = Runtime.getRuntime().availableProcessors() * 4; // 默认线程数
     private int threadPoolQueueSize = 10000;
 
     public GRPCServer(String host, int port) {
@@ -109,7 +109,7 @@ public class GRPCServer implements Server {
     }
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
-
+        // 拒绝策略
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
             log.warn("Grpc server thread pool is full, rejecting the task");
