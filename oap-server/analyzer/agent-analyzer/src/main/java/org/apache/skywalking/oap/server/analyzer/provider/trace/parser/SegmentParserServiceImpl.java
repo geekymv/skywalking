@@ -36,6 +36,7 @@ public class SegmentParserServiceImpl implements ISegmentParserService {
 
     @Override
     public void send(SegmentObject segment) {
+        // 每个 SegmentObject 都会创建 TraceAnalyzer
         final TraceAnalyzer traceAnalyzer = new TraceAnalyzer(moduleManager, listenerManager, config);
         traceAnalyzer.doAnalysis(segment);
     }

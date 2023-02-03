@@ -131,7 +131,9 @@ public class SegmentAnalysisListener implements FirstAnalysisListener, EntryAnal
             if (span.getEndTime() > endTimestamp) {
                 endTimestamp = span.getEndTime();
             }
+            // 这里 segmentStatusAnalyzer 是 FromSpanStatus
             isError = isError || segmentStatusAnalyzer.isError(span);
+            // 将 span 中可搜索的 tag 添加到 segment
             appendSearchableTags(span);
         });
         final long accurateDuration = endTimestamp - startTimestamp;

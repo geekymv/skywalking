@@ -94,7 +94,7 @@ public class AnalyzerModuleProvider extends ModuleProvider {
         moduleConfig.setDbLatencyThresholdsAndWatcher(thresholds);
         moduleConfig.setUninstrumentedGatewaysConfig(uninstrumentedGatewaysConfig);
         moduleConfig.setTraceSamplingPolicyWatcher(traceSamplingPolicyWatcher);
-
+        // trace segment 解析器
         segmentParserService = new SegmentParserServiceImpl(getManager(), moduleConfig);
         this.registerServiceImplementation(ISegmentParserService.class, segmentParserService);
         // 加载 meter config
@@ -119,7 +119,7 @@ public class AnalyzerModuleProvider extends ModuleProvider {
         dynamicConfigurationService.registerConfigChangeWatcher(thresholds);
         dynamicConfigurationService.registerConfigChangeWatcher(uninstrumentedGatewaysConfig);
         dynamicConfigurationService.registerConfigChangeWatcher(traceSamplingPolicyWatcher);
-
+        // 设置 listener manager
         segmentParserService.setListenerManager(listenerManager());
 
         processService.start(meterConfigs);

@@ -41,6 +41,9 @@ public enum SegmentStatusStrategy {
      */
     FROM_FIRST_SPAN(new FromFirstSpan());
 
+    /**
+     * SegmentStatusStrategy 的每个实例（比如 FROM_SPAN_STATUS）实现了 SegmentStatusAnalyzer 接口
+     */
     @Getter
     private final SegmentStatusAnalyzer exceptionAnalyzer;
 

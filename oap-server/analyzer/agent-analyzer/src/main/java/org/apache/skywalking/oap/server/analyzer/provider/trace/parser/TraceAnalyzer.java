@@ -46,9 +46,9 @@ public class TraceAnalyzer {
         if (segmentObject.getSpansList().size() == 0) {
             return;
         }
-
+        // 创建 AnalysisListener
         createSpanListeners();
-
+        // 通知 SegmentListener
         notifySegmentListener(segmentObject);
 
         segmentObject.getSpansList().forEach(spanObject -> {
@@ -110,12 +110,14 @@ public class TraceAnalyzer {
     private void notifySegmentListener(SegmentObject segmentObject) {
         analysisListeners.forEach(listener -> {
             if (listener.containsPoint(AnalysisListener.Point.Segment)) {
+                // 解析 segment
                 ((SegmentListener) listener).parseSegment(segmentObject);
             }
         });
     }
 
     private void createSpanListeners() {
+        // 使用 AnalysisListenerFactory 创建 AnalysisListener
         listenerManager.getSpanListenerFactories()
                        .forEach(
                            spanListenerFactory -> analysisListeners.add(

@@ -31,6 +31,7 @@ public class TraceSegmentSampler {
     private final TraceSamplingPolicyWatcher traceSamplingPolicyWatcher;
 
     public boolean shouldSample(SegmentObject segmentObject, int duration) {
+        // default.sampleRate = 10000 (trace-sampling-policy-settings.yml)
         int sample = Math.abs(segmentObject.getTraceId().hashCode()) % 10000;
         String serviceName = segmentObject.getService();
         return traceSamplingPolicyWatcher.shouldSample(serviceName, sample, duration);

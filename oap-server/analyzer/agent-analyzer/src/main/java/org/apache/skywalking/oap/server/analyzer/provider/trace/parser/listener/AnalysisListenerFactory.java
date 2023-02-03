@@ -24,6 +24,7 @@ import org.apache.skywalking.oap.server.analyzer.provider.AnalyzerModuleConfig;
 /**
  * AnalysisListenerFactory implementation creates the listener instances when required. Every AnalysisListener could
  * have its own creation factory.
+ * 每个 AnalysisListener 有自己的创建工厂
  */
 public interface AnalysisListenerFactory {
     AnalysisListener create(ModuleManager moduleManager, AnalyzerModuleConfig config);
