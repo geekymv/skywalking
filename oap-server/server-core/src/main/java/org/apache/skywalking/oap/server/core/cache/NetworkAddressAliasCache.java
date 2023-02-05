@@ -29,6 +29,7 @@ import org.apache.skywalking.oap.server.library.module.Service;
 /**
  * NetworkAddressAliasCache set the temporary network address - service/instance mapping in the memory cache. This data
  * was original analysis from reference of trace span.
+ * 网络地址别名缓存
  */
 @Slf4j
 public class NetworkAddressAliasCache implements Service {

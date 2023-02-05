@@ -160,6 +160,7 @@ public class CoreModuleProvider extends ModuleProvider {
             moduleConfig.getEndpointNameMaxLength(),
             endpointNameGrouping
         );
+        // 注册 NamingControl
         this.registerServiceImplementation(NamingControl.class, namingControl);
         MeterEntity.setNamingControl(namingControl);
         try {
@@ -252,7 +253,7 @@ public class CoreModuleProvider extends ModuleProvider {
         this.registerServiceImplementation(ModelCreator.class, storageModels);
         this.registerServiceImplementation(IModelManager.class, storageModels);
         this.registerServiceImplementation(ModelManipulator.class, storageModels);
-
+        // 注册网络地址别名缓存
         this.registerServiceImplementation(
             NetworkAddressAliasCache.class, new NetworkAddressAliasCache(moduleConfig));
 

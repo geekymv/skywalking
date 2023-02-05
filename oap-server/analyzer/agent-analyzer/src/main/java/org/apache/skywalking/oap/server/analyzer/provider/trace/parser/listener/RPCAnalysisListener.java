@@ -58,9 +58,12 @@ import static org.apache.skywalking.oap.server.analyzer.provider.trace.parser.Sp
 @Slf4j
 @RequiredArgsConstructor
 public class RPCAnalysisListener extends CommonAnalysisListener implements EntryAnalysisListener, ExitAnalysisListener, LocalAnalysisListener {
+    // EntrySpan
     private final List<RPCTrafficSourceBuilder> callingInTraffic = new ArrayList<>(10);
+    // ExitSpan
     private final List<RPCTrafficSourceBuilder> callingOutTraffic = new ArrayList<>(10);
     private final List<DatabaseSlowStatementBuilder> dbSlowStatementBuilders = new ArrayList<>(10);
+    // LocalSpan
     private final List<EndpointSourceBuilder> logicEndpointBuilders = new ArrayList<>(10);
     private final Gson gson = new Gson();
     private final SourceReceiver sourceReceiver;
@@ -158,7 +161,7 @@ public class RPCAnalysisListener extends CommonAnalysisListener implements Entry
         }
 
         RPCTrafficSourceBuilder sourceBuilder = new RPCTrafficSourceBuilder(namingControl);
-
+        // ExitSpan 作为客户端，调用的目标服务端地址
         final String networkAddress = span.getPeer();
         if (StringUtil.isEmpty(networkAddress)) {
             return;

@@ -122,5 +122,9 @@ public class TraceAnalyzer {
                        .forEach(
                            spanListenerFactory -> analysisListeners.add(
                                spanListenerFactory.create(moduleManager, config)));
+        // RPCAnalysisListener
+        // EndpointDepFromCrossThreadAnalysisListener
+        // NetworkAddressAliasMappingListener
+        // SegmentAnalysisListener
     }
 }
