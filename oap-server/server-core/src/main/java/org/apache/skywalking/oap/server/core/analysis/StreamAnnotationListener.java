@@ -31,6 +31,7 @@ import org.apache.skywalking.oap.server.library.module.ModuleDefineHolder;
 
 /**
  * Stream annotation listener, process the class with {@link Stream} annotation.
+ * @Stream 注解监听器
  */
 public class StreamAnnotationListener implements AnnotationListener {
 
@@ -56,6 +57,7 @@ public class StreamAnnotationListener implements AnnotationListener {
             }
 
             if (stream.processor().equals(RecordStreamProcessor.class)) {
+                // SegmentRecord 的 processor 是 RecordStreamProcessor
                 RecordStreamProcessor.getInstance().create(moduleDefineHolder, stream, aClass);
             } else if (stream.processor().equals(MetricsStreamProcessor.class)) {
                 // 创建 Metrics work flow
