@@ -38,21 +38,43 @@ public class AgentConfigurationsWatcher extends ConfigChangeWatcher {
         this.settingsString = null;
         this.agentConfigurationsTable = new AgentConfigurationsTable();
         // noinspection UnstableApiUsage
+        // 空的动态配置信息
         this.emptyAgentConfigurations = new AgentConfigurations(
             null, new HashMap<>(),
             Hashing.sha512().hashString("EMPTY", StandardCharsets.UTF_8).toString()
         );
     }
 
+    /**
+     * 配置变更通知
+     * @param value of new.
+     */
     @Override
     public void notify(ConfigChangeEvent value) {
         if (value.getEventType().equals(EventType.DELETE)) {
             settingsString = null;
             this.agentConfigurationsTable = new AgentConfigurationsTable();
         } else {
+            // agetn config 配置 key: configuration-discovery.default.agentConfigurations
+            // agent config 配置内容:
+            /*
+            configurations:
+              //service name
+              serviceA:
+                // Configurations of service A
+                // Key and Value are determined by the agent side.
+                // Check the agent setup doc for all available configurations.
+                key1: value1
+                key2: value2
+                ...
+              serviceB:
+                ...
+             */
+
             settingsString = value.getNewValue();
             AgentConfigurationsReader agentConfigurationsReader =
                 new AgentConfigurationsReader(new StringReader(value.getNewValue()));
+            // 读取配置内容
             this.agentConfigurationsTable = agentConfigurationsReader.readAgentConfigurationsTable();
         }
     }
@@ -71,6 +93,7 @@ public class AgentConfigurationsWatcher extends ConfigChangeWatcher {
      * @return Service dynamic configuration information
      */
     public AgentConfigurations getAgentConfigurations(String service) {
+        // 根据 agent 服务名称从本地缓存中获取配置
         AgentConfigurations agentConfigurations = agentConfigurationsTable.getAgentConfigurationsCache().get(service);
         if (null == agentConfigurations) {
             return emptyAgentConfigurations;

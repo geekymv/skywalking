@@ -55,6 +55,8 @@ public class ConfigurationDiscoveryProvider extends ModuleProvider {
 
     @Override
     public void prepare() throws ServiceNotProvidedException, ModuleStartException {
+        // 创建 agent config watcher
+        // provider 名称 default
         agentConfigurationsWatcher = new AgentConfigurationsWatcher(this);
     }
 
@@ -64,10 +66,12 @@ public class ConfigurationDiscoveryProvider extends ModuleProvider {
                                                                               .provider()
                                                                               .getService(
                                                                                   DynamicConfigurationService.class);
+        // 注册 ConfigChangeWatcher
         dynamicConfigurationService.registerConfigChangeWatcher(agentConfigurationsWatcher);
 
         /*
          * Register ConfigurationDiscoveryServiceHandler to process gRPC requests for ConfigurationDiscovery.
+         * 注册 ConfigurationDiscoveryServiceHandler
          */
         GRPCHandlerRegister grpcHandlerRegister = getManager().find(SharingServerModule.NAME)
                                                               .provider()

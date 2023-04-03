@@ -50,9 +50,11 @@ public class AgentConfigurationsReader {
         AgentConfigurationsTable agentConfigurationsTable = new AgentConfigurationsTable();
         try {
             if (Objects.nonNull(yamlData)) {
+                // 读取配置内容
                 Map configurationsData = (Map) yamlData.get("configurations");
                 if (configurationsData != null) {
                     configurationsData.forEach((k, v) -> {
+                        // key 是 agent 服务名称
                         Map map = (Map) v;
                         StringBuilder serviceConfigStr = new StringBuilder();
                         Map<String, String> config = new HashMap<>(map.size());
@@ -63,11 +65,13 @@ public class AgentConfigurationsReader {
                         });
 
                         // noinspection UnstableApiUsage
+                        //  Hashing.sha512() 计算 uuid
                         AgentConfigurations agentConfigurations = new AgentConfigurations(
                             k.toString(), config,
                             Hashing.sha512().hashString(
                                 serviceConfigStr.toString(), StandardCharsets.UTF_8).toString()
                         );
+                        // 将配置放入本地缓存, key 是 agent 服务名称
                         agentConfigurationsTable.getAgentConfigurationsCache()
                                                 .put(agentConfigurations.getService(), agentConfigurations);
                     });

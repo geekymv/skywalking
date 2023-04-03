@@ -35,6 +35,7 @@ import org.apache.skywalking.oap.server.recevier.configuration.discovery.AgentCo
 
 /**
  * Provide query agent dynamic configuration, through the gRPC protocol,
+ * 提供 agent 动态配置查询
  */
 @Slf4j
 public class ConfigurationDiscoveryServiceHandler extends ConfigurationDiscoveryServiceGrpc.ConfigurationDiscoveryServiceImplBase implements GRPCHandler {
@@ -57,18 +58,20 @@ public class ConfigurationDiscoveryServiceHandler extends ConfigurationDiscovery
      * Process the request for querying the dynamic configuration of the agent.
      * If there is agent dynamic configuration information corresponding to the service,
      * the ConfigurationDiscoveryCommand is returned to represent the dynamic configuration information.
+     * 处理动态配置查询请求
      */
     @Override
     public void fetchConfigurations(final ConfigurationSyncRequest request,
                                     final StreamObserver<Commands> responseObserver) {
         Commands.Builder commandsBuilder = Commands.newBuilder();
-
+        // 根据 agent service name 获取配置
         AgentConfigurations agentConfigurations = agentConfigurationsWatcher.getAgentConfigurations(
             request.getService());
         if (null != agentConfigurations) {
             if (disableMessageDigest || !Objects.equals(agentConfigurations.getUuid(), request.getUuid())) {
                 ConfigurationDiscoveryCommand configurationDiscoveryCommand =
                     newAgentDynamicConfigCommand(agentConfigurations);
+                // 序列化配置
                 commandsBuilder.addCommands(configurationDiscoveryCommand.serialize().build());
             }
         }
@@ -82,6 +85,7 @@ public class ConfigurationDiscoveryServiceHandler extends ConfigurationDiscovery
             KeyStringValuePair.Builder builder = KeyStringValuePair.newBuilder().setKey(k).setValue(v);
             configurationList.add(builder.build());
         });
+        // 生成序列号 UUID.randomUUID().toString() -> serialNumber
         return new ConfigurationDiscoveryCommand(
             UUID.randomUUID().toString(), agentConfigurations.getUuid(), configurationList);
     }

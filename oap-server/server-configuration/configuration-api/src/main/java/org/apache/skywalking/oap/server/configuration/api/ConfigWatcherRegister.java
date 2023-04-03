@@ -53,7 +53,7 @@ public abstract class ConfigWatcherRegister implements DynamicConfigurationServi
         if (isStarted) {
             throw new IllegalStateException("Config Register has been started. Can't register new watcher.");
         }
-
+        // 构造 WatcherHolder 中的 key
         WatcherHolder holder = new WatcherHolder(watcher);
         if (singleConfigChangeWatcherRegister.containsKey(
             holder.getKey()) || groupConfigChangeWatcherRegister.containsKey(holder.getKey())) {
@@ -77,7 +77,7 @@ public abstract class ConfigWatcherRegister implements DynamicConfigurationServi
         isStarted = true;
 
         log.info("Current configurations after the bootstrap sync." + LINE_SEPARATOR + singleConfigChangeWatcherRegister.toString());
-
+        // 启动定时任务同步配置，每 syncPeriod(60s) 秒执行一次
         Executors.newSingleThreadScheduledExecutor()
                  .scheduleAtFixedRate(
                      new RunnableWithExceptionProtection(
@@ -92,6 +92,7 @@ public abstract class ConfigWatcherRegister implements DynamicConfigurationServi
     }
 
     private void singleConfigsSync() {
+        // 从配置中心读取配置
         Optional<ConfigTable> configTable = readConfig(singleConfigChangeWatcherRegister.keys());
 
         // Config table would be null if no change detected from the implementation.
@@ -111,6 +112,7 @@ public abstract class ConfigWatcherRegister implements DynamicConfigurationServi
                 if (newItemValue == null) {
                     if (watcher.value() != null) {
                         // Notify watcher, the new value is null with delete event type.
+                        // 通知配置 watcher
                         watcher.notify(
                             new ConfigChangeWatcher.ConfigChangeEvent(null, ConfigChangeWatcher.EventType.DELETE));
                     } else {
@@ -118,6 +120,7 @@ public abstract class ConfigWatcherRegister implements DynamicConfigurationServi
                     }
                 } else {
                     if (!newItemValue.equals(watcher.value())) {
+                        // 通知配置 watcher
                         watcher.notify(new ConfigChangeWatcher.ConfigChangeEvent(
                             newItemValue,
                             ConfigChangeWatcher.EventType.MODIFY
@@ -261,6 +264,7 @@ public abstract class ConfigWatcherRegister implements DynamicConfigurationServi
 
         public WatcherHolder(ConfigChangeWatcher watcher) {
             this.watcher = watcher;
+            // 构造key 的名称, AgentConfigurationsWatcher -> configuration-discovery.default.agentConfigurations
             this.key = String.join(
                 ".", watcher.getModule(), watcher.getProvider().name(),
                 watcher.getItemName()
