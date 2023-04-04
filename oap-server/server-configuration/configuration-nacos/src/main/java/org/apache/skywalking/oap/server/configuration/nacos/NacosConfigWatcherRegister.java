@@ -65,16 +65,18 @@ public class NacosConfigWatcherRegister extends ConfigWatcherRegister {
             properties.put(PropertyKeyConst.ACCESS_KEY, settings.getAccessKey());
             properties.put(PropertyKeyConst.SECRET_KEY, settings.getSecretKey());
         }
+        // 创建配置服务
         this.configService = NacosFactory.createConfigService(properties);
     }
 
     @Override
     public Optional<ConfigTable> readConfig(Set<String> keys) {
         removeUninterestedKeys(keys);
+        // 注册 listener
         registerKeyListeners(keys);
 
         final ConfigTable table = new ConfigTable();
-
+        // 遍历 kv, 放入 ConfigTable
         for (Map.Entry<String, Optional<String>> entry : configItemKeyedByName.entrySet()) {
             final String key = entry.getKey();
             final Optional<String> value = entry.getValue();
@@ -124,9 +126,11 @@ public class NacosConfigWatcherRegister extends ConfigWatcherRegister {
 
         for (final String dataId : keys) {
             if (listenersByKey.containsKey(dataId)) {
+                // 判断 key 是否已经存在
                 continue;
             }
             try {
+                // 创建 key 关联的 listener
                 listenersByKey.putIfAbsent(dataId, new Listener() {
                     @Override
                     public Executor getExecutor() {
@@ -135,12 +139,15 @@ public class NacosConfigWatcherRegister extends ConfigWatcherRegister {
 
                     @Override
                     public void receiveConfigInfo(String configInfo) {
+                        // 配置变更回调
                         onDataIdValueChanged(dataId, configInfo);
                     }
                 });
+                // 添加 listener
                 configService.addListener(dataId, group, listenersByKey.get(dataId));
 
                 // the key is newly added, read the config for the first time
+                // 对于新的key，立即读取配置值
                 final String config = configService.getConfig(dataId, group, 1000);
                 onDataIdValueChanged(dataId, config);
             } catch (NacosException e) {
@@ -167,7 +174,7 @@ public class NacosConfigWatcherRegister extends ConfigWatcherRegister {
         if (log.isInfoEnabled()) {
             log.info("Nacos config changed: {}: {}", dataId, configInfo);
         }
-
+        // 存储配置变更信息
         configItemKeyedByName.put(dataId, Optional.ofNullable(configInfo));
     }
 }
